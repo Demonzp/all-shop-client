@@ -1,0 +1,18 @@
+const langRu = {
+  'authorization':'авторизация',
+  'sign-in-title':'Вход в интернет магазин',
+  'sign-in-login-title':'Ел. почта или телефон',
+  'password':'Пароль',
+  'repiat-password':'Повторите Пароль',
+  'sign-in': 'Войти',
+  'sign-in-question':'Еще не заригестрированы?',
+  'sign-up-titile':'Форма регистрации',
+  'sign-up-email': 'Ел. почта',
+  'sign-up-phone': 'Номер телефона',
+  'firs-name': 'Имя',
+  'second-name': 'Фамилия',
+  'birthday': 'День Рождения',
+  'sign-up-text': 'Поля помеченые "*" обязательны для заполнения',
+  'sign-up': 'Зарегистрироваться',
+  'sign-up-question': 'Уже зарегистрированы?',
+}

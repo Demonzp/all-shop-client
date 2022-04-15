@@ -1,0 +1,37 @@
+.custom-btn{
+  cursor: pointer;
+}
+
+.btn-link-active{
+  background-color: rgb(255, 219, 248);
+}
+
+.btn-primery-link{
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  font-size: 20px;
+}
+
+.btn-primery-link:hover{
+  color: rgb(77, 0, 87);
+}
+
+.btn-cont-link{
+  display: flex;
+  box-shadow: 2px 2px 2px;
+  align-items: center;
+  padding-left: 6px;
+  padding-right: 6px;
+  border-radius: 8px;
+  min-height: 40px;
+  background-color: rgb(150, 56, 132);
+}
+
+.p-t-20{
+  padding-top: 20px;
+}
+
+.m-bg-pink-light{
+  background-color: rgb(255, 219, 248);;
+}

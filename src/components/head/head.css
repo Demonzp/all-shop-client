@@ -1,0 +1,59 @@
+.head-bg{
+  background-color: rgb(219, 140, 196);
+}
+
+.head-btn{
+  font-size: 1.25rem;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  border-color: rgb(116, 39, 86);
+}
+
+.head-btn:hover{
+  background-color:  rgb(116, 39, 86);
+}
+
+.head-cont{
+  width: 60%;
+}
+
+.head-ico{
+  margin-right: 10px;
+  font-size: 32px;
+  color: rgb(255, 219, 248);
+}
+
+.form-control{
+  min-width: 280px;
+}
+
+.head-cont-search{
+  padding-top: 5px;
+}
+
+.head-cont-shop-card{
+  position: relative;
+}
+
+.shop-cart{
+  top:-20%;
+  right:0;
+  position: absolute;
+}
+
+.btn-link-list{
+  min-width: 100%;
+  font-size: 20px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-color: rgb(116, 39, 86);
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+  min-height: 50px;
+  padding-left: 5px;
+}
