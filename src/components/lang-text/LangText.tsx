@@ -11,6 +11,7 @@ const LangText: React.FC<Props> = ({k})=>{
   const [text, setText] = useState('---//---');
 
   useEffect(()=>{
+    //console.log('k = ', k);
     if(!isLoading && langObj.hasOwnProperty(k)){
       setText(langObj[k]);
     }
