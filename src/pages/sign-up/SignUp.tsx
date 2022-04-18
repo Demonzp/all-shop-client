@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import AlertManager from '../../components/alert-manager';
 import CustomColInput from '../../components/custom-col-input';
 import CustomPhoneInput from '../../components/custom-phone-input';
 import LangText from '../../components/lang-text';
@@ -27,7 +28,7 @@ const state = {
 
 const SignUp = () => {
   const { langObj } = useAppSelector(state => state.lang);
-  const { errorsValid } = useAppSelector(state=>state.user);
+  const { errorsValid, errorMessage } = useAppSelector(state => state.user);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   //console.log('render');
@@ -36,7 +37,7 @@ const SignUp = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [errorPhone, setErrorPhone] = useState<TObjKeyAnyString>({});
 
-  const changePhoneHandle = (val:string) => {
+  const changePhoneHandle = (val: string) => {
     setPhoneNumber(prev => {
       if (val.length > 9) {
         return prev;
@@ -47,9 +48,9 @@ const SignUp = () => {
   }
 
   const onSubmit = () => {
-    const errPhone = uaMobPhoneRuls({phoneNumber});
+    const errPhone = uaMobPhoneRuls({ phoneNumber });
     setErrorPhone(errPhone);
-    
+
     const validateRes = handleSubmit();
     // if(errPhone.phone || validateRes.errors){
     //   console.log('что то пошло не так');
@@ -57,17 +58,17 @@ const SignUp = () => {
     // }
     dispatch(userReg({
       ...validateRes.values,
-      phoneNumber:'80' + phoneNumber
+      phoneNumber: '80' + phoneNumber
     }))
       .unwrap()
-      .then(()=>navigate(`../${ERoutes.SIGN_IN}`));
+      .then(() => navigate(`../${ERoutes.SIGN_IN}`));
     //console.log('validateRes = ', validateRes);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     //console.log();
-    if(errorsValid.phoneNumber){
-      setErrorPhone({['phoneNumber']:errorsValid.phoneNumber});
+    if (errorsValid.phoneNumber) {
+      setErrorPhone({ ['phoneNumber']: errorsValid.phoneNumber });
     }
     setErrors(errorsValid);
   }, [errorsValid]);
@@ -77,8 +78,9 @@ const SignUp = () => {
       <div className="card" style={{ minWidth: 360 }}>
         <div className="card-body">
           <h5 className="card-title"><LangText k="sign-up-titile" /></h5>
+          <AlertManager errorMessage={errorMessage}/> 
           <CustomColInput
-            type="email"
+            type="text"
             name="email"
             onChange={onChange}
             data={data}
@@ -94,7 +96,7 @@ const SignUp = () => {
               onChange={(e) => onChange({ name: 'email', value: e.target.value })}
             />
           </div> */}
-          <CustomPhoneInput 
+          <CustomPhoneInput
             value={phoneNumber}
             errors={errorPhone}
             onChange={changePhoneHandle}
@@ -165,11 +167,11 @@ const SignUp = () => {
           </div>
           <div className="col-md-6 p-t-20">
             <label className="form-label" style={{ minWidth: 300 }}><LangText k="birthday" /></label>
-            <input 
-              type="date" 
+            <input
+              type="date"
               value={data.birthday}
               className="form-control"
-              onChange={(e)=>onChange({name:'birthday', value:e.target.value})} 
+              onChange={(e) => onChange({ name: 'birthday', value: e.target.value })}
             />
           </div>
           <CustomColInput

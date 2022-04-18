@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { clearMessage, setIsReadMessage } from '../store/slices/user';
+import { clearAllMessage, setIsReadMessage } from '../store/slices/user';
 
 const useMessageManager = () => {
   const { isReadMessage } = useAppSelector(state=>state.user);
@@ -12,7 +12,7 @@ const useMessageManager = () => {
     if(!isReadMessage){
       dispatch(setIsReadMessage(true));
     }else{
-      dispatch(clearMessage());
+      dispatch(clearAllMessage());
     }
   }, [location]);
 };

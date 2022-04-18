@@ -1,10 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import CustomValidationError from '../../services/customValidationError';
-import { fetchUserReg } from '../../services/fetchUser';
+import { fetchUserReg, fetchUserSignin } from '../../services/fetchUser';
 import { ETypeCustomErrors, ICustomValidationError, IRejectWithValueError, IRejectWithValueValid } from '../../types/errors';
 import { TObjKeyAnyString } from '../../types/global';
 import { ESex } from '../../types/sex';
-import { TReqUserReg } from '../../types/user';
+import { TReqUserReg, TReqUserSignin } from '../../types/user';
+import { IUserBase } from '../slices/user';
 import { RootState } from '../store';
 
 export const userReg = createAsyncThunk<string, TObjKeyAnyString, {
@@ -36,3 +37,24 @@ export const userReg = createAsyncThunk<string, TObjKeyAnyString, {
       }
     }
   );
+
+  export const userSignin = createAsyncThunk<IUserBase, TReqUserSignin, {
+    state: RootState,
+    rejectWithValue: IRejectWithValueError | IRejectWithValueValid
+  }>
+    (
+      'user/userSignin',
+      async (data, { rejectWithValue }) => {
+        try {
+          const user = await fetchUserSignin(data);
+          return user;
+        } catch (error) {
+          const err = error as Error;
+          
+          if(err.name===ETypeCustomErrors.VALID_ERROR){
+            return rejectWithValue({ errorName: ETypeCustomErrors.VALID_ERROR, errors: (err as CustomValidationError<ICustomValidationError>).errors });
+          }
+          return rejectWithValue({errorName: ETypeCustomErrors.CUSTOM_ERROR, message: (error as Error).message });
+        }
+      }
+    );

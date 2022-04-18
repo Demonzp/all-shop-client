@@ -9,3 +9,8 @@ export type TReqUserReg = {
   birthday: number,
   password: string
 }
+
+export type TReqUserSignin = {
+  login: string,
+  password: string
+}

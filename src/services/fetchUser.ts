@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
-import { TResSuccess } from '../types/resTypes';
-import { TReqUserReg } from '../types/user';
+import { IUserBase } from '../store/slices/user';
+import { TResSuccess, TResUser } from '../types/resTypes';
+import { TReqUserReg, TReqUserSignin } from '../types/user';
 import { errorHandle } from './errorAxiosHandle';
 
 const fetchUserReg = async (data:TReqUserReg):Promise<string> => {
@@ -14,6 +15,17 @@ const fetchUserReg = async (data:TReqUserReg):Promise<string> => {
   }
 };
 
+const fetchUserSignin = async (data:TReqUserSignin):Promise<IUserBase> => {
+  try {
+    const res = await axios.post<TResUser>('/user/sign-in', data);
+
+    return res.data.user;
+  } catch (error) {
+    return errorHandle(error as AxiosError);
+  }
+};
+
 export {
+  fetchUserSignin,
   fetchUserReg
 } 

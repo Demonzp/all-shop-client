@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ETypeCustomErrors, IRejectWithValueValid } from "../../types/errors";
+import { ETypeCustomErrors, IRejectWithValueError, IRejectWithValueValid } from "../../types/errors";
 import { TObjKeyAnyString } from "../../types/global";
-import { userReg } from "../actions/user";
+import { userReg, userSignin } from "../actions/user";
 
 export enum ERoles {
   ADMIN = 1,
@@ -44,9 +44,10 @@ const sliceUser = createSlice({
       state.isReadMessage = action.payload;
     },
 
-    clearMessage(state) {
+    clearAllMessage(state) {
       state.isReadMessage = true;
       state.message = '';
+      state.errorMessage = '';
     }
   },
   extraReducers: (builder) => {
@@ -68,12 +69,39 @@ const sliceUser = createSlice({
         (payload as IRejectWithValueValid).errors.forEach(err => {
           state.errorsValid[err.field] = err.message;
         });
+      }else{
+        state.errorMessage = (payload as IRejectWithValueError).message;
+      }
+      state.isLoading = false;
+    });
+
+    builder.addCase(userSignin.pending, (state) => {
+      state.errorMessage = '';
+      state.message = '';
+      state.errorsValid = {};
+      state.isLoading = true;
+    });
+
+    builder.addCase(userSignin.fulfilled, (state, { payload }) => {
+      console.log('payload = ', payload);
+      state.user = payload;
+      state.isLoading = false;
+    });
+
+    builder.addCase(userSignin.rejected, (state, { payload }) => {
+      console.log('payload = ', payload);
+      if ((payload as IRejectWithValueValid).errorName === ETypeCustomErrors.VALID_ERROR) {
+        (payload as IRejectWithValueValid).errors.forEach(err => {
+          state.errorsValid[err.field] = err.message;
+        });
+      }else{
+        state.errorMessage = (payload as IRejectWithValueError).message;
       }
       state.isLoading = false;
     });
   }
 });
 
-export const { setIsReadMessage, clearMessage } = sliceUser.actions;
+export const { setIsReadMessage, clearAllMessage } = sliceUser.actions;
 
 export default sliceUser;
