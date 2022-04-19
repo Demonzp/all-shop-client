@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { IUserBase } from '../store/slices/user';
+import { TReqUserReg, TReqUserSignin } from '../types/reqTypes';
 import { TResSuccess, TResUser } from '../types/resTypes';
-import { TReqUserReg, TReqUserSignin } from '../types/user';
 import { errorHandle } from './errorAxiosHandle';
 
 const fetchUserReg = async (data:TReqUserReg):Promise<string> => {

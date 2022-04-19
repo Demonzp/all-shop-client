@@ -1,5 +1,12 @@
 import { ESex } from './sex';
 
+export type TReqCreateCategory = {
+  token: string,
+  nameUA: string,
+  translit: string,
+  nameRU: string
+}
+
 export type TReqUserReg = {
   email: string,
   firstName: string,

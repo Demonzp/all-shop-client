@@ -3,8 +3,8 @@ import CustomValidationError from '../../services/customValidationError';
 import { fetchUserReg, fetchUserSignin } from '../../services/fetchUser';
 import { ETypeCustomErrors, ICustomValidationError, IRejectWithValueError, IRejectWithValueValid } from '../../types/errors';
 import { TObjKeyAnyString } from '../../types/global';
+import { TReqUserReg, TReqUserSignin } from '../../types/reqTypes';
 import { ESex } from '../../types/sex';
-import { TReqUserReg, TReqUserSignin } from '../../types/user';
 import { IUserBase } from '../slices/user';
 import { RootState } from '../store';
 
@@ -29,32 +29,32 @@ export const userReg = createAsyncThunk<string, TObjKeyAnyString, {
         return user;
       } catch (error) {
         const err = error as Error;
-        
-        if(err.name===ETypeCustomErrors.VALID_ERROR){
+
+        if (err.name === ETypeCustomErrors.VALID_ERROR) {
           return rejectWithValue({ errorName: ETypeCustomErrors.VALID_ERROR, errors: (err as CustomValidationError<ICustomValidationError>).errors });
         }
-        return rejectWithValue({errorName: ETypeCustomErrors.CUSTOM_ERROR, message: (error as Error).message });
+        return rejectWithValue({ errorName: ETypeCustomErrors.CUSTOM_ERROR, message: (error as Error).message });
       }
     }
   );
 
-  export const userSignin = createAsyncThunk<IUserBase, TReqUserSignin, {
-    state: RootState,
-    rejectWithValue: IRejectWithValueError | IRejectWithValueValid
-  }>
-    (
-      'user/userSignin',
-      async (data, { rejectWithValue }) => {
-        try {
-          const user = await fetchUserSignin(data);
-          return user;
-        } catch (error) {
-          const err = error as Error;
-          
-          if(err.name===ETypeCustomErrors.VALID_ERROR){
-            return rejectWithValue({ errorName: ETypeCustomErrors.VALID_ERROR, errors: (err as CustomValidationError<ICustomValidationError>).errors });
-          }
-          return rejectWithValue({errorName: ETypeCustomErrors.CUSTOM_ERROR, message: (error as Error).message });
+export const userSignin = createAsyncThunk<IUserBase, TReqUserSignin, {
+  state: RootState,
+  rejectWithValue: IRejectWithValueError | IRejectWithValueValid
+}>
+  (
+    'user/userSignin',
+    async (data, { rejectWithValue }) => {
+      try {
+        const user = await fetchUserSignin(data);
+        return user;
+      } catch (error) {
+        const err = error as Error;
+
+        if (err.name === ETypeCustomErrors.VALID_ERROR) {
+          return rejectWithValue({ errorName: ETypeCustomErrors.VALID_ERROR, errors: (err as CustomValidationError<ICustomValidationError>).errors });
         }
+        return rejectWithValue({ errorName: ETypeCustomErrors.CUSTOM_ERROR, message: (error as Error).message });
       }
-    );
+    }
+  );

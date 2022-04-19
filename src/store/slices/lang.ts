@@ -1,18 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ICustomError } from '../../types/errors';
-import { TObjKeyAnyString } from '../../types/global';
+import { TObjKeyAnyObj, TObjKeyAnyString } from '../../types/global';
 import { ELangs } from '../../types/langs';
 import { getLangGlobal } from '../actions/lang';
 
 export interface ILangState {
+  tepmLangs:TObjKeyAnyObj;
   langObj: TObjKeyAnyString;
   lang: ELangs;
   isLoading: boolean;
 }
 
 const initialState: ILangState = {
+  tepmLangs: {},
   langObj: {},
-  lang: ELangs.RU,
+  lang: ELangs.UA,
   isLoading: false
 };
 
@@ -31,6 +33,11 @@ const sliceLang = createSlice({
 
     builder.addCase(getLangGlobal.fulfilled, (state, { payload }) => {
       //console.log('payload = ', payload);
+      //const loadLang = state.lang as 
+      state.tepmLangs = {
+        ...state.tepmLangs,
+        [state.lang]:payload
+      };
       state.langObj = payload;
       state.isLoading = false;
     });

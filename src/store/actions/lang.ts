@@ -10,8 +10,13 @@ export const getLangGlobal = createAsyncThunk<TObjKeyAnyString, string, {
 }>
   (
     'lang/getLangGlobal',
-    async (data, { rejectWithValue }) => {
+    async (data, {getState, rejectWithValue }) => {
       try {
+        const currentLang = getState().lang.lang;
+        const tepmLangs = getState().lang.tepmLangs;
+        if(tepmLangs.hasOwnProperty(currentLang)){
+          return tepmLangs[currentLang] as TObjKeyAnyString;
+        }
         const lang = await fetchLangGlobal(data);
         return lang;
       } catch (error) {

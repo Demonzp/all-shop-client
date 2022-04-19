@@ -1,4 +1,6 @@
-import React, { Fragment, useRef } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { useAppSelector } from '../../store/hooks';
+import { ERoles } from '../../store/slices/user';
 import { TNavData } from '../head/Head';
 import NavLinkSwitch from '../nav-link-switch';
 
@@ -6,7 +8,7 @@ type Props = {
   navData: TNavData;
 }
 
-const DropLink:React.FC<Props> = ({navData}) => {
+const DropLink: React.FC<Props> = ({ navData }) => {
   const collapseRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -19,9 +21,9 @@ const DropLink:React.FC<Props> = ({navData}) => {
         <div className="d-flex material-icons align-items-center">expand_more</div>
       </div>
       <div ref={collapseRef} className="collapse">
-        <div className="row" style={{paddingLeft:"30px"}}>
+        <div className="row" style={{ paddingLeft: "30px" }}>
           {
-            navData.children.map(l=><NavLinkSwitch key={l.title} navData={l}/>)
+            navData.children.map(l => <NavLinkSwitch key={l.title} navData={l} />)
           }
         </div>
       </div>

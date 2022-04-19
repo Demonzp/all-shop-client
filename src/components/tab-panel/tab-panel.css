@@ -1,0 +1,9 @@
+.tab-panel-btn{
+  background-color: rgb(255, 219, 248) !important;
+  margin-right: 3px !important;
+  min-width: 60px;
+}
+
+.tab-panel-btn-active{
+  background-color: rgb(150, 56, 132) !important;
+}

@@ -10,11 +10,13 @@ import { getOptionsFromEnum } from '../../services/global';
 import { ELangs } from '../../types/langs';
 import { setLang } from '../../store/slices/lang';
 import LangText from '../lang-text';
+import { ERoles } from '../../store/slices/user';
 
 export type TNavData = {
   title: string;
   to: string;
-  children: TNavData[]
+  children: TNavData[];
+  isAdmin?: boolean;
 }
 
 const navList: TNavData[] = [
@@ -52,7 +54,7 @@ const navList: TNavData[] = [
         title: 'naw2-2',
         to: 'link2-2',
         children: []
-      },
+      }
     ]
   },
   {
@@ -60,6 +62,20 @@ const navList: TNavData[] = [
     to: 'link3',
     children: []
   },
+];
+
+const navListAdmin: TNavData[] = [
+  {
+    title: 'AdminPanel',
+    to: '/admin',
+    children: [
+      {
+        title: 'Category Manager',
+        to: '/category-manager',
+        children:[]
+      }
+    ]
+  }
 ];
 
 const Head = () => {
@@ -88,7 +104,23 @@ const Head = () => {
         </div>
         <div className="offcanvas-body">
           <div className="list-group">
-            <NavLinkSwitch navData={{ to: ERoutes.ATORIZE, title: 'авторизация', children: [] }} />
+            {
+              !user?
+                <NavLinkSwitch navData={{ to: ERoutes.ATORIZE, title: 'авторизация', children: [] }} />
+                :
+                null
+            }
+            {
+              user?
+                user.role===ERoles.ADMIN?
+                <Fragment>
+                  {navListAdmin.map(l=><NavLinkSwitch key={l.title} navData={l}/>)}
+                </Fragment>
+                :
+                null
+              :
+              null
+            }
             {
               navList.map(l => {
                 return <NavLinkSwitch key={l.title} navData={l} />

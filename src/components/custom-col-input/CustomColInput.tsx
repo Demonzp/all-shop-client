@@ -9,10 +9,12 @@ type Props = {
   data: TObjKeyAnyString;
   onChange: (data:any)=>void;
   errors?: TObjKeyAnyString;
+  disabled?: boolean, 
+  readOnly?: boolean,
   label?: string;
 }
 
-const CustomColInput:React.FC<Props> = ({type, name, data, onChange, label, errors}) => {
+const CustomColInput:React.FC<Props> = ({type, name, data, onChange, label, disabled, readOnly, errors}) => {
   const [calcType, setCalcType] = useState<TInputTypes>();
   const [isError, setIsError] = useState(false);
 
@@ -48,6 +50,8 @@ const CustomColInput:React.FC<Props> = ({type, name, data, onChange, label, erro
       }
       <input
         type={calcType}
+        disabled={disabled} 
+        readOnly={readOnly}
         className={`form-control ${isError?'is-invalid':''}`}
         value={data[name]}
         onChange={(e) => onChange({ name, value: e.target.value })}

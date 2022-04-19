@@ -4,10 +4,10 @@ import { TObjKeyAnyString } from "../../types/global";
 import { userReg, userSignin } from "../actions/user";
 
 export enum ERoles {
-  ADMIN = 1,
-  MODERATOR1 = 2,
-  MODERATOR2 = 3,
-  USER = 4
+  ADMIN = 'admin',
+  MODERATOR1 = 'moderator1',
+  MODERATOR2 = 'moderator2',
+  USER = 'user'
 }
 
 export interface IUserBase {
@@ -32,7 +32,13 @@ const initialState: IUserState = {
   message: '',
   isReadMessage: true,
   errorMessage: '',
-  user: null,
+  user: {
+    publicId:'dawd',
+    role: ERoles.ADMIN,
+    firstName: 'Frfr',
+    secondName: '',
+    token: 'raesgresg'
+  },
   isLoading: false
 };
 
