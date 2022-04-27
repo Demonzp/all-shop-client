@@ -1,6 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
-import { useAppSelector } from '../../store/hooks';
-import { ERoles } from '../../store/slices/user';
+import React, { Fragment, useRef } from 'react';
 import { TNavData } from '../head/Head';
 import NavLinkSwitch from '../nav-link-switch';
 

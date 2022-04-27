@@ -1,19 +1,24 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
+import { createCategory, createSubCategory, getCategorys } from '../actions/categorys';
+import { IRejectWithValueError } from '../../types/errors';
 
 export interface ICategory{
-  id: string,
   nameUA: string,
   nameRU: string,
-  translit: string
+  nameTranslit: string,
+  categorys: ICategory [],
+  tableProducts: any []
 }
 
 export interface IMainStateCategory {
-  categorys: any[];
+  categorys: ICategory [];
+  errorMessage: string;
   isLoading: boolean;
 }
 
 const initialState: IMainStateCategory = {
   categorys: [],
+  errorMessage: '',
   isLoading: false
 };
 
@@ -24,7 +29,49 @@ const sliceCategorys = createSlice({
 
   },
   extraReducers: (builder) => {
-    
+    builder.addCase(createCategory.pending, (state) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(createCategory.fulfilled, (state, { payload }) => {
+      //console.log('payload = ', payload);
+      state.isLoading = false;
+    });
+
+    builder.addCase(createCategory.rejected, (state, { payload }) => {
+      state.errorMessage = (payload as IRejectWithValueError).message;
+      state.isLoading = false;
+    });
+
+    builder.addCase(createSubCategory.pending, (state) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(createSubCategory.fulfilled, (state, { payload }) => {
+      //console.log('payload = ', payload);
+      state.isLoading = false;
+    });
+
+    builder.addCase(createSubCategory.rejected, (state, { payload }) => {
+      state.errorMessage = (payload as IRejectWithValueError).message;
+      state.isLoading = false;
+    });
+
+    builder.addCase(getCategorys.pending, (state) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(getCategorys.fulfilled, (state, { payload }) => {
+      //console.log('payload = ', payload);
+      state.categorys = payload;
+      state.isLoading = false;
+    });
+
+    builder.addCase(getCategorys.rejected, (state, { payload }) => {
+      state.errorMessage = (payload as IRejectWithValueError).message;
+      state.isLoading = false;
+    });
+
   }
 });
 

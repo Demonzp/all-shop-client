@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import useSimpleForm from '../../hooks/useSimpleForm';
+import React, { useEffect, useState } from 'react';
+import useSimpleForm, { TReturn } from '../../hooks/useSimpleForm';
 import { getLangText, getOptionsFromEnum } from '../../services/global';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setLang } from '../../store/slices/lang';
@@ -9,6 +9,8 @@ import CustomColInput from '../custom-col-input';
 import LangText from '../lang-text';
 import TabPanel from '../tab-panel';
 import { createCategoryRuls as validation } from '../../validation/createCategory';
+import { createCategory } from '../../store/actions/categorys';
+import { TObjKeyAnyString } from '../../types/global';
 
 const getTranslit = (value: string): string => {
   const translit_ua = [
@@ -285,53 +287,65 @@ const getTranslit = (value: string): string => {
       'en': ''
     },
   ];
-  console.log('value = ', value);
+  //console.log('value = ', value);
   let translit = '';
   for (let i = 0; i < value.length; i++) {
     const char = value[i];
-    console.log('char =', char);
+    //console.log('char =', char);
     const whisTransChar = translit_ua.find(c => c.ua === char);
-    console.log('whisTransChar = ', whisTransChar);
+    //console.log('whisTransChar = ', whisTransChar);
     let transChar = '';
     if (whisTransChar) {
       transChar = whisTransChar.en;
     }
     translit += transChar;
   }
-  console.log('translit = ', translit);
+  //console.log('translit = ', translit);
   return translit;
 }
 
-const CategoryCreate = () => {
+export type TFormCategory = {
+  nameUA: string,
+  translit: string,
+  defaultTranslit: string,
+  nameRU: string
+}
+
+type Props = {
+  state: TFormCategory,
+  onSubmit: (data: TReturn<TFormCategory>) => void
+}
+
+const FormCategory: React.FC<Props> = ({ state, onSubmit }) => {
   const [activeTab, setActiveTab] = useState('');
   const dispatch = useAppDispatch();
-
   const { langObj } = useAppSelector(state => state.lang);
+  const { errorMessage } = useAppSelector(state => state.categorys);
 
-  const [state, setState] = useState({
-    nameUA: '',
-    translit: '',
-    defaultTranslit: '',
-    nameRU:'',
-  });
+  const [tempState, setTempState] = useState(state);
 
-  const { data, onChange, errors, handleSubmit } = useSimpleForm({ state, validation});
+  const { data, onChange, errors, handleSubmit } = useSimpleForm({ state: tempState, validation });
+
+  useEffect(() => {
+    setTempState(state);
+  }, [state]);
 
   useEffect(() => {
     if (data.nameUA.length > 0) {
-      setState((prev) => {
+      setTempState((prev) => {
         return {
           ...prev,
-          name: data.nameUA,
+          nameUA: data.nameUA,
           defaultTranslit: getTranslit(data.nameUA)
         }
       });
     }
   }, [data.nameUA]);
 
-  const onSubmit = () => {
+  const onPreSubmit = () => {
     const valsRes = handleSubmit();
-    console.log('valsRes = ', valsRes);
+    onSubmit(valsRes);
+    //console.log('valsRes = ', valsRes);
   };
 
   const onActive = (t: string) => {
@@ -348,7 +362,7 @@ const CategoryCreate = () => {
             <div className="card" style={{ minWidth: 360 }}>
               <div className="card-body">
                 <h5 className="card-title"><LangText k="form-create-category" /></h5>
-                <AlertManager />
+                <AlertManager errorMessage={errorMessage}/>
                 <CustomColInput
                   type="text"
                   name="nameRU"
@@ -371,7 +385,7 @@ const CategoryCreate = () => {
                   <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={onSubmit}
+                    onClick={onPreSubmit}
                   >
                     <LangText k="btn-create-category" />
                   </button>
@@ -387,7 +401,7 @@ const CategoryCreate = () => {
             <div className="card" style={{ minWidth: 360 }}>
               <div className="card-body">
                 <h5 className="card-title"><LangText k="form-create-category" /></h5>
-                <AlertManager />
+                <AlertManager errorMessage={errorMessage}/>
                 <CustomColInput
                   type="text"
                   name="nameUA"
@@ -417,7 +431,7 @@ const CategoryCreate = () => {
                   <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={onSubmit}
+                    onClick={onPreSubmit}
                   >
                     <LangText k="btn-create-category" />
                   </button>
@@ -433,4 +447,4 @@ const CategoryCreate = () => {
   );
 };
 
-export default CategoryCreate;
+export default FormCategory;

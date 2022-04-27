@@ -1,6 +1,12 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
+import CategoryManagerItem from '../../components/category-manager-item';
 import LangText from '../../components/lang-text';
+import { getCategorys } from '../../store/actions/categorys';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { ERoutes } from '../../types/routes';
+
+import './category-manager.css';
 
 // const categorys = {
 //   id:'1212',
@@ -83,15 +89,37 @@ import { ERoutes } from '../../types/routes';
 // }
 
 const CategoryManager = () => {
+  const {categorys} = useAppSelector(state=>state.categorys);
+  const dispatch = useAppDispatch();
+
+  useEffect(()=>{
+    dispatch(getCategorys());
+  }, []);
+
   return (
-    <div>
-      CategoryManager
-      <div className="btn-cont-link" style={{maxWidth:200}}>
-        <NavLink to={ERoutes.CREATE_CATEGORY} className="btn-primery-link">
-          <LangText k="btn-create-category" />
-        </NavLink>
+    <div className="d-flex justify-content-center">
+      <div className="col cat-manager-cont">
+        <div className="cat-manager-list-cont">
+          <ul className="list-group">
+          {
+            categorys.map(category=>{
+              return (
+                <CategoryManagerItem 
+                  key={category.nameTranslit} 
+                  category={category}
+                />
+              );
+            })
+          }
+          </ul>
+        </div>
+        <div className="btn-cont-link" style={{maxWidth:200}}>
+          <NavLink to={ERoutes.CREATE_CATEGORY} className="btn-primery-link">
+            <LangText k="btn-create-category" />
+          </NavLink>
+        </div>
       </div>
-      <Outlet />
+      {/* <Outlet /> */}
     </div>
   );
 };

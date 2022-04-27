@@ -1,10 +1,13 @@
 import { ESex } from './sex';
 
-export type TReqCreateCategory = {
-  token: string,
-  nameUA: string,
-  translit: string,
-  nameRU: string
+export interface IReqCreateCategory {
+  nameUA: string;
+  translit: string;
+  nameRU: string;
+}
+
+export interface IReqCreateSubCategory extends IReqCreateCategory{
+  path: string;
 }
 
 export type TReqUserReg = {

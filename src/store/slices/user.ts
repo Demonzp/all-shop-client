@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ETypeCustomErrors, IRejectWithValueError, IRejectWithValueValid } from "../../types/errors";
 import { TObjKeyAnyString } from "../../types/global";
-import { userReg, userSignin } from "../actions/user";
+import { getUser, userReg, userSignin } from "../actions/user";
 
 export enum ERoles {
   ADMIN = 'admin',
@@ -25,27 +25,34 @@ export interface IUserState {
   errorMessage: string;
   user: IUserBase | null;
   isLoading: boolean;
+  isAtempted: boolean;
 }
-
+// {
+//   publicId:'dawd',
+//   role: ERoles.ADMIN,
+//   firstName: 'Frfr',
+//   secondName: '',
+//   token: 'raesgresg'
+// }
 const initialState: IUserState = {
   errorsValid: {},
   message: '',
   isReadMessage: true,
   errorMessage: '',
-  user: {
-    publicId:'dawd',
-    role: ERoles.ADMIN,
-    firstName: 'Frfr',
-    secondName: '',
-    token: 'raesgresg'
-  },
-  isLoading: false
+  user: null,
+  isLoading: true,
+  isAtempted: false
 };
 
 const sliceUser = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    setGuest(state){
+      state.isLoading = false;
+      state.isAtempted = true;
+    },
+
     setIsReadMessage(state, action: PayloadAction<boolean>) {
       state.isReadMessage = action.payload;
     },
@@ -57,6 +64,32 @@ const sliceUser = createSlice({
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(getUser.pending, (state) => {
+      state.errorsValid = {};
+      state.isLoading = true;
+    });
+
+    builder.addCase(getUser.fulfilled, (state, { payload }) => {
+      //console.log('payload = ', payload);
+      state.user = payload;
+      state.isReadMessage = false;
+      state.isLoading = false;
+      state.isAtempted = true;
+    });
+
+    builder.addCase(getUser.rejected, (state, { payload }) => {
+      console.log('payload = ', payload);
+      if ((payload as IRejectWithValueValid).errorName === ETypeCustomErrors.VALID_ERROR) {
+        (payload as IRejectWithValueValid).errors.forEach(err => {
+          state.errorsValid[err.field] = err.message;
+        });
+      }else{
+        state.errorMessage = (payload as IRejectWithValueError).message;
+      }
+      state.isAtempted = true;
+      state.isLoading = false;
+    });
+
     builder.addCase(userReg.pending, (state) => {
       state.errorsValid = {};
       state.isLoading = true;
@@ -108,6 +141,6 @@ const sliceUser = createSlice({
   }
 });
 
-export const { setIsReadMessage, clearAllMessage } = sliceUser.actions;
+export const { setGuest, setIsReadMessage, clearAllMessage } = sliceUser.actions;
 
 export default sliceUser;

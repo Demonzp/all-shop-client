@@ -8,9 +8,11 @@ export const errorHandle = <T>(error: AxiosError) => {
     if(Number(error.response.status)===412){
       throw new CustomValidationError<T>(error.response.data.errors);
     }else{
-      //console.log('err = ', error.message);
-      if(error.response.data.message){
-        throw new Error(error.response.data.message);
+      console.log('err = ', error.message);
+      console.log('err data = ', error.response.data);
+      if(error.response.data.error){
+        //console.log('err = ', error.response.data);
+        throw new Error(error.response.data.error);
       }else{
         throw error;
       }
