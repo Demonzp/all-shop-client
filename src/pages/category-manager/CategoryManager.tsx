@@ -1,9 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import CategoryManagerItem from '../../components/category-manager-item';
+import CategoryTaransfer from '../../components/category-transfer';
+import CustomModal from '../../components/custom-modal';
+import CustomModalBody from '../../components/custom-modal-body';
+import CustomModalFooter from '../../components/custom-modal-footer';
 import LangText from '../../components/lang-text';
+import { getLangText } from '../../services/global';
 import { getCategorys } from '../../store/actions/categorys';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { ICategory } from '../../store/slices/categorys';
+import { ELangs } from '../../types/langs';
 import { ERoutes } from '../../types/routes';
 
 import './category-manager.css';
@@ -88,16 +95,63 @@ import './category-manager.css';
 
 // }
 
+const getNameCat = (lang:string, category:ICategory|undefined):string=>{
+  if(category){
+    if(lang===ELangs.RU){
+      return category.nameRU;
+    }else{
+      return category.nameUA;
+    }
+  }else{
+    return '';
+  }
+};
+
 const CategoryManager = () => {
+  const [show, setShow] = useState(false);
+
+  const toggle= ()=>setShow(prev=>!prev);
+  const toggleForce = (data: boolean)=>setShow(data);
+  const [categoryTrans, setCategoryTrans] = useState<ICategory>();
+  const [parentId, setParentId] = useState<string|null>(null);
   const {categorys} = useAppSelector(state=>state.categorys);
+  const {langObj, lang} = useAppSelector(state=>state.lang);
   const dispatch = useAppDispatch();
 
   useEffect(()=>{
     dispatch(getCategorys());
+    // setInterval(()=>{
+    //   console.log('нажал!!!!');
+    //   toggle();
+    // }, 2000);
   }, []);
+
+  const beginTransfer = (c:ICategory)=>{
+    toggle();
+    setCategoryTrans(c);
+  };
 
   return (
     <div className="d-flex justify-content-center">
+      <CustomModal 
+        show={show} 
+        toggleForce={toggleForce} 
+        title={`${getLangText(langObj, 'title-transfer-cat')} "${getNameCat(lang, categoryTrans)}"`}
+      >
+        <CustomModalBody>
+          <CategoryTaransfer category={categoryTrans} isForce={show}/>
+        </CustomModalBody>
+        <CustomModalFooter>
+          <button type="button" className="btn btn-primary"><LangText k="transfer" /></button>
+          <button 
+            type="button" 
+            className="btn btn-secondary" 
+            onClick={toggle}
+          >
+            <LangText k="cancel" />
+          </button>
+        </CustomModalFooter>
+      </CustomModal>
       <div className="col cat-manager-cont">
         <div className="cat-manager-list-cont">
           <ul className="list-group">
@@ -107,6 +161,7 @@ const CategoryManager = () => {
                 <CategoryManagerItem 
                   key={category.nameTranslit} 
                   category={category}
+                  onTransfer={beginTransfer}
                 />
               );
             })
@@ -119,7 +174,6 @@ const CategoryManager = () => {
           </NavLink>
         </div>
       </div>
-      {/* <Outlet /> */}
     </div>
   );
 };

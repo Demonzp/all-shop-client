@@ -27,7 +27,7 @@ const CategoryCreate = ()=>{
   };
 
   return(
-    <FormCategory state={state} onSubmit={onSubmit}/>
+    <FormCategory state={state} onSubmit={onSubmit} title="form-create-category" btnTitle="btn-create-category"/>
   );
 };
 

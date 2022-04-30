@@ -8,18 +8,24 @@ import LangText from '../lang-text';
 
 import './category-manager-item.css';
 
-type Props = {
+type TUrlProps = {
   category: ICategory;
   parent?: string;
 }
 
-const getUrl = (data: Props): string => {
+type Props = {
+  category: ICategory;
+  onTransfer: (data: ICategory)=> void;
+  parent?: string;
+}
+
+const getUrl = (data: TUrlProps): string => {
   let url = data.parent ? data.parent + '/' + data.category.nameTranslit : data.category.nameTranslit;
   return url;
   //let url = `${ERoutes.ADD_CATEGORY}/${category.nameTranslit}`;
 };
 
-const CategoryManagerItem: React.FC<Props> = ({ category, parent }) => {
+const CategoryManagerItem: React.FC<Props> = ({ category, parent, onTransfer }) => {
   const { lang } = useAppSelector(state => state.lang);
   const navigate = useNavigate();
   const collapseRef = useRef<HTMLDivElement>(null);
@@ -43,27 +49,40 @@ const CategoryManagerItem: React.FC<Props> = ({ category, parent }) => {
         </div>
         <div className="col">
           <div className="d-flex justify-content-evenly">
-            {
-              getUrl({ category, parent }).split('/').length < 3 ?
-                <div
-                  className="btn btn-success"
-                  onClick={() => navigate(`${ERoutes.ADD_CATEGORY}/${getUrl({ category, parent })}`)}
-                >
-                  <LangText k="btn-add-category" />
-                </div>
-                :
-                null
-            }
-            <div className="btn btn-primary"><LangText k="btn-change-category" /></div>
-            <div className="btn btn-danger"><LangText k="btn-del-category" /></div>
-          </div>
+            <div style={{maxWidth:200}}>
+              {
+                getUrl({ category, parent }).split('/').length < 3 ?
+                  <div
+                    className="btn btn-success"
+                    onClick={() => navigate(`${ERoutes.ADD_CATEGORY}/${getUrl({ category, parent })}`)}
+                  >
+                    <LangText k="btn-add-category" />
+                  </div>
+                  :
+                  null
+              }
+              <div 
+                className="btn btn-primary"
+                onClick={() => navigate(`${ERoutes.EDIT_CATEGORY}/${getUrl({ category, parent })}`)}
+              >
+                <LangText k="btn-change-category" />
+              </div>
+              <div 
+                className="btn btn-primary"
+                onClick={()=>onTransfer(category)}
+              >
+                <LangText k="btn-move-category" />
+              </div>
+              <div className="btn btn-danger"><LangText k="btn-del-category" /></div>
+            </div>
+          </div>  
         </div>
       </div>
       <div ref={collapseRef} className="collapse">
         <div className="row" style={{ paddingLeft: "30px" }}>
           <ul>
             {
-              category.categorys.map(c => <CategoryManagerItem key={c.nameTranslit} category={c} parent={getUrl({ category, parent })} />)
+              category.categorys.map(c => <CategoryManagerItem key={c.nameTranslit} category={c} parent={getUrl({ category, parent })} onTransfer={onTransfer}/>)
             }
           </ul>
         </div>

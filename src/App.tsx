@@ -8,6 +8,8 @@ import NotAuth from './middlewares/NotAuth';
 import Autorize from './pages/autorize';
 import CategoryAdd from './pages/category-add';
 import CategoryCreate from './pages/category-create';
+import CategoryEdit from './pages/category-edit';
+import { ENameParamsCatEdit } from './pages/category-edit/CategoryEdit';
 import CategoryManager from './pages/category-manager';
 import Home from './pages/home';
 import SignIn from './pages/sign-in';
@@ -74,15 +76,15 @@ const App = () => {
             </Route>
             <Route path={ERoutes.EDIT_CATEGORY}>
               <Route index element={<Admin><div>Page Not found 404</div></Admin>} />
-              <Route path=":id" element={
+              <Route path={`:${ENameParamsCatEdit.ID}`} element={
                 <Admin>
-                  <div>Edit</div>
+                  <CategoryEdit />
                 </Admin>
               }
               >
-                <Route path=":id2" element={
+                <Route path={`:${ENameParamsCatEdit.ID2}`} element={
                   <Admin>
-                    <div>Edit</div>
+                    <CategoryEdit />
                   </Admin>
                 }
                 />

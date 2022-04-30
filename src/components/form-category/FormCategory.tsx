@@ -313,10 +313,12 @@ export type TFormCategory = {
 
 type Props = {
   state: TFormCategory,
+  title: string,
+  btnTitle: string,
   onSubmit: (data: TReturn<TFormCategory>) => void
 }
 
-const FormCategory: React.FC<Props> = ({ state, onSubmit }) => {
+const FormCategory: React.FC<Props> = ({ state, onSubmit, title, btnTitle }) => {
   const [activeTab, setActiveTab] = useState('');
   const dispatch = useAppDispatch();
   const { langObj } = useAppSelector(state => state.lang);
@@ -361,7 +363,7 @@ const FormCategory: React.FC<Props> = ({ state, onSubmit }) => {
           activeTab === ELangs.RU ?
             <div className="card" style={{ minWidth: 360 }}>
               <div className="card-body">
-                <h5 className="card-title"><LangText k="form-create-category" /></h5>
+                <h5 className="card-title"><LangText k={title} /></h5>
                 <AlertManager errorMessage={errorMessage}/>
                 <CustomColInput
                   type="text"
@@ -387,7 +389,7 @@ const FormCategory: React.FC<Props> = ({ state, onSubmit }) => {
                     className="btn btn-primary"
                     onClick={onPreSubmit}
                   >
-                    <LangText k="btn-create-category" />
+                    <LangText k={btnTitle} />
                   </button>
                 </div>
               </div>
@@ -400,7 +402,7 @@ const FormCategory: React.FC<Props> = ({ state, onSubmit }) => {
           activeTab === ELangs.UA ?
             <div className="card" style={{ minWidth: 360 }}>
               <div className="card-body">
-                <h5 className="card-title"><LangText k="form-create-category" /></h5>
+                <h5 className="card-title"><LangText k={title} /></h5>
                 <AlertManager errorMessage={errorMessage}/>
                 <CustomColInput
                   type="text"
@@ -433,7 +435,7 @@ const FormCategory: React.FC<Props> = ({ state, onSubmit }) => {
                     className="btn btn-primary"
                     onClick={onPreSubmit}
                   >
-                    <LangText k="btn-create-category" />
+                    <LangText k={btnTitle} />
                   </button>
                 </div>
               </div>

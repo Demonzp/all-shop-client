@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createCategory, createSubCategory, getCategorys } from '../actions/categorys';
+import { createCategory, createSubCategory, editCategory, getCategorys } from '../actions/categorys';
 import { IRejectWithValueError } from '../../types/errors';
 
 export interface ICategory{
@@ -29,7 +29,23 @@ const sliceCategorys = createSlice({
 
   },
   extraReducers: (builder) => {
+    builder.addCase(editCategory.pending, (state) => {
+      state.errorMessage = '';
+      state.isLoading = true;
+    });
+
+    builder.addCase(editCategory.fulfilled, (state, { payload }) => {
+      //console.log('payload = ', payload);
+      state.isLoading = false;
+    });
+
+    builder.addCase(editCategory.rejected, (state, { payload }) => {
+      state.errorMessage = (payload as IRejectWithValueError).message;
+      state.isLoading = false;
+    });
+
     builder.addCase(createCategory.pending, (state) => {
+      state.errorMessage = '';
       state.isLoading = true;
     });
 
@@ -44,6 +60,7 @@ const sliceCategorys = createSlice({
     });
 
     builder.addCase(createSubCategory.pending, (state) => {
+      state.errorMessage = '';
       state.isLoading = true;
     });
 
@@ -58,6 +75,7 @@ const sliceCategorys = createSlice({
     });
 
     builder.addCase(getCategorys.pending, (state) => {
+      state.errorMessage = '';
       state.isLoading = true;
     });
 

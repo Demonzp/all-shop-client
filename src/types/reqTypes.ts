@@ -7,7 +7,11 @@ export interface IReqCreateCategory {
 }
 
 export interface IReqCreateSubCategory extends IReqCreateCategory{
-  path: string;
+  categoryId: string;
+}
+
+export interface IReqEditCategory extends IReqCreateCategory{
+  categoryId: string;
 }
 
 export type TReqUserReg = {

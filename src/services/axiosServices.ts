@@ -1,11 +1,11 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
-class AxiosServices{
+class AxiosServices {
 
   axios: AxiosInstance;
   private static instance: AxiosServices;
 
-  constructor(){
+  constructor() {
     this.axios = axios.create();
   }
 
@@ -17,26 +17,30 @@ class AxiosServices{
     return this.instance;
   }
 
-  setAuth(token:string):void{
+  setAuth(token: string): void {
     this.axios = axios.create({
-      headers:{
+      headers: {
         Authorization: token
       }
     });
   }
 
-  setGuest():void{
+  setGuest(): void {
     this.axios = axios.create();
   }
 
-  async get<T>(path:string, params?:any):Promise<AxiosResponse<T>>{
+  async get<T>(path: string, params?: any): Promise<AxiosResponse<T>> {
     return await this.axios.get<T>(path, {
       params
     });
   }
 
-  async post<T>(path:string, data:any):Promise<AxiosResponse<T>>{
+  async post<T>(path: string, data: any): Promise<AxiosResponse<T>> {
     return await this.axios.post<T>(path, data);
+  }
+
+  async put<T>(path: string, data: any): Promise<AxiosResponse<T>> {
+    return await this.axios.put<T>(path, data);
   }
 
 }
