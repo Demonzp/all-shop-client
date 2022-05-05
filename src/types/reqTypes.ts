@@ -6,12 +6,22 @@ export interface IReqCreateCategory {
   nameRU: string;
 }
 
-export interface IReqCreateSubCategory extends IReqCreateCategory{
+export interface IReqCreateSubCategory extends IReqCreateCategory {
   categoryId: string;
 }
 
-export interface IReqEditCategory extends IReqCreateCategory{
+export interface IReqEditCategory extends IReqCreateCategory {
   categoryId: string;
+}
+
+export type TReqTransferCategory = {
+  categoryId: string;
+  parentId: string | null;
+}
+
+export type TReqDelCategory = {
+  categoryId: string;
+  password: string;
 }
 
 export type TReqUserReg = {

@@ -163,7 +163,7 @@ const Head = () => {
                 !user ?
                   <div className="d-sm-none d-md-block d-none d-sm-block ml-5 mr-5">
                     <div className="btn-cont-link">
-                      <NavLink to={ERoutes.ATORIZE} className="btn-primery-link">
+                      <NavLink to={ERoutes.ATORIZE} className="btn-primary-link">
                         <LangText k="authorization" />
                       </NavLink>
                     </div>

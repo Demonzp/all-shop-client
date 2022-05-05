@@ -1,7 +1,7 @@
 export enum ERoutes{
   HOME='/',
   CATEGORY='category',
-  CATEGORY_MANAGER='category-manager',
+  CATEGORY_MANAGER='/category-manager',
   CREATE_CATEGORY='create',
   EDIT_CATEGORY='edit',
   ADD_CATEGORY='add',

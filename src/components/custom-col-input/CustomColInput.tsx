@@ -7,7 +7,7 @@ type Props = {
   type?: TInputTypes;
   name: string;
   data: TObjKeyAnyString;
-  onChange: (data:any)=>void;
+  onChange: (data:{name:string,value:string})=>void;
   errors?: TObjKeyAnyString;
   disabled?: boolean, 
   readOnly?: boolean,

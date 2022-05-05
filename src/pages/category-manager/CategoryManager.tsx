@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import AlertManager from '../../components/alert-manager';
 import CategoryManagerItem from '../../components/category-manager-item';
 import CategoryTaransfer from '../../components/category-transfer';
+import CustomColInput from '../../components/custom-col-input';
 import CustomModal from '../../components/custom-modal';
 import CustomModalBody from '../../components/custom-modal-body';
 import CustomModalFooter from '../../components/custom-modal-footer';
 import LangText from '../../components/lang-text';
+import LoadingBtn from '../../components/loading-btn';
 import { getLangText } from '../../services/global';
-import { getCategorys } from '../../store/actions/categorys';
+import { deleteCategory, getCategorys, transferCategory } from '../../store/actions/categorys';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { ICategory } from '../../store/slices/categorys';
+import { EColors } from '../../types/colors';
 import { ELangs } from '../../types/langs';
 import { ERoutes } from '../../types/routes';
 
@@ -95,58 +99,137 @@ import './category-manager.css';
 
 // }
 
-const getNameCat = (lang:string, category:ICategory|undefined):string=>{
-  if(category){
-    if(lang===ELangs.RU){
+const getNameCat = (lang: string, category: ICategory | undefined): string => {
+  if (category) {
+    if (lang === ELangs.RU) {
       return category.nameRU;
-    }else{
+    } else {
       return category.nameUA;
     }
-  }else{
+  } else {
     return '';
   }
 };
 
 const CategoryManager = () => {
   const [show, setShow] = useState(false);
+  const [show2, setShow2] = useState(false);
 
-  const toggle= ()=>setShow(prev=>!prev);
-  const toggleForce = (data: boolean)=>setShow(data);
-  const [categoryTrans, setCategoryTrans] = useState<ICategory>();
-  const [parentId, setParentId] = useState<string|null>(null);
-  const {categorys} = useAppSelector(state=>state.categorys);
-  const {langObj, lang} = useAppSelector(state=>state.lang);
+  const toggle = () => setShow(prev => !prev);
+  const toggleForce = (data: boolean) => setShow(data);
+  const toggle2 = () => setShow2(prev => !prev);
+  const toggleForce2 = (data: boolean) => setShow2(data);
+  const [categorySelect, setCategorySelect] = useState<ICategory>();
+  const [parentId, setParentId] = useState<string | null>(null);
+  const [isSelected, setIsSelected] = useState(false);
+  const { categorys, isLoading, errorsValid, errorMessage } = useAppSelector(state => state.categorys);
+  const { langObj, lang } = useAppSelector(state => state.lang);
+  const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(getCategorys());
-    // setInterval(()=>{
-    //   console.log('нажал!!!!');
-    //   toggle();
-    // }, 2000);
   }, []);
 
-  const beginTransfer = (c:ICategory)=>{
+  useEffect(()=>{
+    console.log(isLoading,'|',errorMessage);
+  }, [isLoading, errorMessage]);
+
+  const beginTransfer = (c: ICategory) => {
     toggle();
-    setCategoryTrans(c);
+    setCategorySelect(c);
+  };
+
+  const setParent = (id: string | null) => {
+    setParentId(id);
+    setIsSelected(true);
+    //console.log('id = ', id);
+  };
+
+  const onSubmit = () => {
+    if (categorySelect && isSelected) {
+      dispatch(transferCategory({
+        categoryId: categorySelect.nameTranslit,
+        parentId
+      }))
+        .unwrap()
+        .then(() => toggleForce(false));
+    }
+  };
+
+  const beginDelete = (c: ICategory) => {
+    toggle2();
+    setCategorySelect(c);
+  };
+
+  const onDel = () => {
+    if (categorySelect) {
+      dispatch(deleteCategory({
+        categoryId: categorySelect.nameTranslit,
+        password
+      }))
+        .unwrap()
+        .then(() => toggleForce2(false));
+    }
   };
 
   return (
     <div className="d-flex justify-content-center">
-      <CustomModal 
-        show={show} 
-        toggleForce={toggleForce} 
-        title={`${getLangText(langObj, 'title-transfer-cat')} "${getNameCat(lang, categoryTrans)}"`}
+      <CustomModal
+        show={show}
+        toggleForce={toggleForce}
+        title={`${getLangText(langObj, 'title-transfer-cat')} "${getNameCat(lang, categorySelect)}"`}
       >
         <CustomModalBody>
-          <CategoryTaransfer category={categoryTrans} isForce={show}/>
+          <CategoryTaransfer category={categorySelect} isForce={show} setParent={setParent} />
         </CustomModalBody>
         <CustomModalFooter>
-          <button type="button" className="btn btn-primary"><LangText k="transfer" /></button>
-          <button 
-            type="button" 
-            className="btn btn-secondary" 
+          <LoadingBtn
+            title={getLangText(langObj, 'transfer')}
+            isLoading={isLoading}
+            onClick={onSubmit}
+          />
+          <button
+            type="button"
+            className="btn btn-secondary"
             onClick={toggle}
+          >
+            <LangText k="cancel" />
+          </button>
+        </CustomModalFooter>
+      </CustomModal>
+      <CustomModal
+        show={show2}
+        toggleForce={toggleForce2}
+        title={`${getLangText(langObj, 'title-del-cat')} "${getNameCat(lang, categorySelect)}"?`}
+      >
+        <CustomModalBody>
+          <p><LangText k="text-del-cat" /></p>
+          <p><LangText k="sub-text-del-cat" /></p>
+          <p><LangText k="confirm-del-cat" /></p>
+          <AlertManager
+            errorMessage={errorMessage}
+          />
+          <CustomColInput
+            type="password"
+            name="password"
+            data={{ password }}
+            errors={errorsValid}
+            onChange={(data) => setPassword(data.value)}
+            label={getLangText(langObj, "password")}
+          />
+        </CustomModalBody>
+        <CustomModalFooter>
+          <LoadingBtn
+            title={getLangText(langObj, 'title-del-cat')}
+            isLoading={isLoading}
+            onClick={onDel}
+            type={EColors.DANGER}
+          />
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={toggle2}
           >
             <LangText k="cancel" />
           </button>
@@ -155,21 +238,22 @@ const CategoryManager = () => {
       <div className="col cat-manager-cont">
         <div className="cat-manager-list-cont">
           <ul className="list-group">
-          {
-            categorys.map(category=>{
-              return (
-                <CategoryManagerItem 
-                  key={category.nameTranslit} 
-                  category={category}
-                  onTransfer={beginTransfer}
-                />
-              );
-            })
-          }
+            {
+              categorys.map(category => {
+                return (
+                  <CategoryManagerItem
+                    key={category.nameTranslit}
+                    category={category}
+                    onTransfer={beginTransfer}
+                    onDelete={beginDelete}
+                  />
+                );
+              })
+            }
           </ul>
         </div>
-        <div className="btn-cont-link" style={{maxWidth:200}}>
-          <NavLink to={ERoutes.CREATE_CATEGORY} className="btn-primery-link">
+        <div className="btn-cont-link" style={{ maxWidth: 200 }}>
+          <NavLink to={ERoutes.CREATE_CATEGORY} className="btn-primary-link">
             <LangText k="btn-create-category" />
           </NavLink>
         </div>

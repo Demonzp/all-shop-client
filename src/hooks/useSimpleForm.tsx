@@ -3,7 +3,7 @@ import { TObjKeyAnyString } from '../types/global';
 
 export type TReturn<T> = {errors?:TObjKeyAnyString, values:T}
 
-type TOnChange<T> = (d:{name:keyof T, value: string|number|boolean})=>void;
+type TOnChange = (d:{name:string, value: string|number|boolean})=>void;
 
 type TClearError = (d:string)=>void;
 
@@ -18,7 +18,7 @@ const useSimpleForm = <T extends {}>({state, validation}:{
   data: T,
   errors: TObjKeyAnyString,
   clearError: TClearError,
-  onChange: TOnChange<T>,
+  onChange: TOnChange,
   setErrors: React.Dispatch<React.SetStateAction<TObjKeyAnyString>>
   handleSubmit: THandleSubmit<T>
 }=>{
@@ -29,7 +29,7 @@ const useSimpleForm = <T extends {}>({state, validation}:{
     setData(state);
   }, [state]);
 
-  const onChange:TOnChange<T> = ({name, value})=>{
+  const onChange:TOnChange = ({name, value})=>{
     setData(prev=>{
         return {
           ...prev,

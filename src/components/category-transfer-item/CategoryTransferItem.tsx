@@ -5,18 +5,16 @@ import { ELangs } from '../../types/langs';
 
 type Props = {
   category: ICategory;
+  setParent: (id: string)=>void
 }
 
-const CategoryTransferItem:React.FC<Props> = ({category}) => {
+const CategoryTransferItem:React.FC<Props> = ({category, setParent}) => {
   const collapseRef = useRef<HTMLDivElement>(null);
   const { lang } = useAppSelector(state => state.lang);
 
 
-  const onRadio = (id: string, isChecked:boolean)=>{
-    if(isChecked){
-      console.log('id = ', id);
-    }
-    
+  const onRadio = (id: string)=>{
+    setParent(id);
   };
 
   return (
@@ -27,7 +25,7 @@ const CategoryTransferItem:React.FC<Props> = ({category}) => {
             name="slectCategory" 
             className="form-check-input" 
             type="radio" 
-            onChange={(e)=>onRadio(category.nameTranslit,e.target.checked)}
+            onChange={(e)=>e.target.checked?onRadio(category.nameTranslit):null}
           />
         </div>
         <div className="col-8">
@@ -58,7 +56,7 @@ const CategoryTransferItem:React.FC<Props> = ({category}) => {
                         name="slectCategory"
                         className="form-check-input"
                         type="radio"
-                        //onChange={(e)=>e.target.checked?onRadio(c2.nameTranslit):null}
+                        onChange={(e)=>e.target.checked?onRadio(c2.nameTranslit):null}
                       />
                     </div>
                     <div className="col-8">

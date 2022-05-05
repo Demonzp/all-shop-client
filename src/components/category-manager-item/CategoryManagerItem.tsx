@@ -15,7 +15,8 @@ type TUrlProps = {
 
 type Props = {
   category: ICategory;
-  onTransfer: (data: ICategory)=> void;
+  onTransfer: (data: ICategory) => void;
+  onDelete: (data: ICategory) => void;
   parent?: string;
 }
 
@@ -25,7 +26,7 @@ const getUrl = (data: TUrlProps): string => {
   //let url = `${ERoutes.ADD_CATEGORY}/${category.nameTranslit}`;
 };
 
-const CategoryManagerItem: React.FC<Props> = ({ category, parent, onTransfer }) => {
+const CategoryManagerItem: React.FC<Props> = ({ category, parent, onTransfer, onDelete }) => {
   const { lang } = useAppSelector(state => state.lang);
   const navigate = useNavigate();
   const collapseRef = useRef<HTMLDivElement>(null);
@@ -38,7 +39,7 @@ const CategoryManagerItem: React.FC<Props> = ({ category, parent, onTransfer }) 
             onClick={() => collapseRef.current ? collapseRef.current.classList.toggle("show") : null}
             className="d-flex justify-content-between align-items-center btn cat-man-item-btn-list"
           >
-            {lang===ELangs.UA?category.nameUA:category.nameRU}
+            {lang === ELangs.UA ? category.nameUA : category.nameRU}
             {
               category.categorys.length > 0 ?
                 <div className="d-flex material-icons align-items-center">expand_more</div>
@@ -49,7 +50,7 @@ const CategoryManagerItem: React.FC<Props> = ({ category, parent, onTransfer }) 
         </div>
         <div className="col">
           <div className="d-flex justify-content-evenly">
-            <div style={{maxWidth:200}}>
+            <div style={{ maxWidth: 200 }}>
               {
                 getUrl({ category, parent }).split('/').length < 3 ?
                   <div
@@ -61,28 +62,52 @@ const CategoryManagerItem: React.FC<Props> = ({ category, parent, onTransfer }) 
                   :
                   null
               }
-              <div 
+              <div
                 className="btn btn-primary"
                 onClick={() => navigate(`${ERoutes.EDIT_CATEGORY}/${getUrl({ category, parent })}`)}
               >
                 <LangText k="btn-change-category" />
               </div>
-              <div 
+              <div
                 className="btn btn-primary"
-                onClick={()=>onTransfer(category)}
+                onClick={() => { }}
+              >
+                <LangText k="up" />
+              </div>
+              <div
+                className="btn btn-primary"
+                onClick={() => { }}
+              >
+                <LangText k="down" />
+              </div>
+              <div
+                className="btn btn-primary"
+                onClick={() => onTransfer(category)}
               >
                 <LangText k="btn-move-category" />
               </div>
-              <div className="btn btn-danger"><LangText k="btn-del-category" /></div>
+              <div
+                className="btn btn-danger"
+                onClick={() => onDelete(category)}
+              >
+                <LangText k="btn-del-category" />
+              </div>
             </div>
-          </div>  
+          </div>
         </div>
       </div>
       <div ref={collapseRef} className="collapse">
         <div className="row" style={{ paddingLeft: "30px" }}>
           <ul>
             {
-              category.categorys.map(c => <CategoryManagerItem key={c.nameTranslit} category={c} parent={getUrl({ category, parent })} onTransfer={onTransfer}/>)
+              category.categorys.map(c => <CategoryManagerItem
+                key={c.nameTranslit}
+                category={c}
+                parent={getUrl({ category, parent })}
+                onTransfer={onTransfer}
+                onDelete={onDelete}
+              />
+              )
             }
           </ul>
         </div>

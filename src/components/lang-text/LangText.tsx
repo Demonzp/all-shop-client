@@ -21,7 +21,7 @@ const LangText: React.FC<Props> = ({k})=>{
     <Fragment>
       {
         isLoading?
-        <div>Loading...</div>
+        'Loading...'
         :
         <Fragment>{text}</Fragment>
       }

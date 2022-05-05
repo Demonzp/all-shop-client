@@ -6,26 +6,53 @@
   background-color: rgb(255, 219, 248);
 }
 
-.btn-primery-link{
+.btn-primary-link{
   color: white;
   text-align: center;
   text-decoration: none;
   font-size: 20px;
 }
 
-.btn-primery-link:hover{
-  color: rgb(77, 0, 87);
+.btn-primary-link:hover{
+  color: rgb(121, 33, 105);
 }
 
 .btn-cont-link{
   display: flex;
-  box-shadow: 2px 2px 2px;
+  /* box-shadow: 2px 2px 2px; */
   align-items: center;
   padding-left: 6px;
   padding-right: 6px;
   border-radius: 8px;
   min-height: 40px;
-  background-color: rgb(150, 56, 132);
+  background-color: rgb(145, 40, 125);
+}
+
+.m-btn-primary{
+  color: white;
+  background-color: rgb(145, 40, 125) !important;
+}
+.m-btn-primary:hover{
+  color: white;
+  background-color: rgb(121, 33, 105) !important;
+}
+
+.m-btn-danger{
+  color: white;
+  background-color: #b02a37;
+}
+
+.m-btn-danger:hover{
+  color: white;
+  background-color: #bb2d3b;
+}
+
+.bg-primary{
+  background-color: rgb(145, 40, 125) !important;
+}
+
+.bg-secondary{
+  background-color: rgb(255, 219, 248) !important;
 }
 
 .p-t-20{
@@ -33,5 +60,5 @@
 }
 
 .m-bg-pink-light{
-  background-color: rgb(255, 219, 248);;
+  background-color: rgb(255, 219, 248);
 }

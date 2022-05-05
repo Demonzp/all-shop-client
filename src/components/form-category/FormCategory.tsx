@@ -11,6 +11,8 @@ import TabPanel from '../tab-panel';
 import { createCategoryRuls as validation } from '../../validation/createCategory';
 import { createCategory } from '../../store/actions/categorys';
 import { TObjKeyAnyString } from '../../types/global';
+import { NavLink } from 'react-router-dom';
+import { ERoutes } from '../../types/routes';
 
 const getTranslit = (value: string): string => {
   const translit_ua = [
@@ -383,7 +385,7 @@ const FormCategory: React.FC<Props> = ({ state, onSubmit, title, btnTitle }) => 
                   errors={{}}
                   label={`${getLangText(langObj, "field-category-def-translit")}`}
                 />
-                <div className="p-t-20">
+                <div className="d-flex justify-content-around p-t-20">
                   <button
                     type="button"
                     className="btn btn-primary"
@@ -391,6 +393,7 @@ const FormCategory: React.FC<Props> = ({ state, onSubmit, title, btnTitle }) => 
                   >
                     <LangText k={btnTitle} />
                   </button>
+                  <NavLink className="btn btn-secondary" to={ERoutes.CATEGORY_MANAGER}><LangText k="cancel" /></NavLink>
                 </div>
               </div>
             </div>
@@ -429,7 +432,7 @@ const FormCategory: React.FC<Props> = ({ state, onSubmit, title, btnTitle }) => 
                   errors={errors}
                   label={`${getLangText(langObj, "field-category-translit")}`}
                 />
-                <div className="p-t-20">
+                <div className="d-flex justify-content-around p-t-20">
                   <button
                     type="button"
                     className="btn btn-primary"
@@ -437,6 +440,7 @@ const FormCategory: React.FC<Props> = ({ state, onSubmit, title, btnTitle }) => 
                   >
                     <LangText k={btnTitle} />
                   </button>
+                  <NavLink className="btn btn-secondary" to={ERoutes.CATEGORY_MANAGER}><LangText k="cancel" /></NavLink>
                 </div>
               </div>
             </div>

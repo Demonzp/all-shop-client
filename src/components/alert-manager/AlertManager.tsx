@@ -14,24 +14,6 @@ const AlertManager:React.FC<Props> = ({infoMessage, successMessage, errorMessage
   const [msg, setMsg] = useState('');
 
   useEffect(()=>{
-    if(errorMessage){
-      if(errorMessage.length>0){
-        setType(EAlerts.DANGER);
-        setMsg(errorMessage);
-      }else{
-        setMsg('');
-      }
-    }
-
-    if(successMessage){
-      if(successMessage.length>0){
-        setType(EAlerts.SUCCESS);
-        setMsg(successMessage);
-      }else{
-        setMsg('');
-      }
-    }
-
     if(infoMessage){
       if(infoMessage.length>0){
         setType(EAlerts.INFO);
@@ -39,8 +21,36 @@ const AlertManager:React.FC<Props> = ({infoMessage, successMessage, errorMessage
       }else{
         setMsg('');
       }
+    }else{
+      setMsg('');
     }
-  },[errorMessage, successMessage, infoMessage]);
+  }, [infoMessage]);
+
+  useEffect(()=>{
+    if(successMessage){
+      if(successMessage.length>0){
+        setType(EAlerts.INFO);
+        setMsg(successMessage);
+      }else{
+        setMsg('');
+      }
+    }else{
+      setMsg('');
+    }
+  }, [successMessage]);
+
+  useEffect(()=>{
+    if(errorMessage){
+      if(errorMessage.length>0){
+        setType(EAlerts.INFO);
+        setMsg(errorMessage);
+      }else{
+        setMsg('');
+      }
+    }else{
+      setMsg('');
+    }
+  }, [errorMessage]);
 
   return(
     <Fragment>

@@ -2,6 +2,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import AlertManager from '../../components/alert-manager';
 import CustomColInput from '../../components/custom-col-input';
 import LangText from '../../components/lang-text';
+import LoadingBtn from '../../components/loading-btn';
 import useSimpleForm from '../../hooks/useSimpleForm';
 import { getLangText } from '../../services/global';
 import { userSignin } from '../../store/actions/user';
@@ -73,13 +74,11 @@ const SignIn = () => {
           </div> */}
           <div className="row p-t-20">
             <div>
-              <button 
-                type="button" 
-                className="btn btn-primary"
+              <LoadingBtn
+                isLoading={false}
+                title={getLangText(langObj, "sign-in")}
                 onClick={onSubmit}
-              >
-                <LangText k="sign-in" />
-              </button>
+              />
             </div>
             <div className="p-t-20">
               <NavLink to={`../${ERoutes.SIGN_UP}`}><LangText k="sign-in-question" /></NavLink>
