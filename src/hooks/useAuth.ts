@@ -15,7 +15,7 @@ const useAuth = ()=>{
       dispatch(getUser())
         .unwrap()
         .catch(err=>{
-          if(err.message==='expired token'){
+          if(err.message==='expired token'||err.message==='jwt malformed'||err.message==='You must be a Login'){
             localStorage.removeItem('token');
             axiosServices.setGuest();
           }

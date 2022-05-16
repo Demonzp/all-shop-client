@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { TObjKeyAnyString } from '../types/global';
+import { TObjKeyAnyString, TOnChangeInput } from '../types/global';
 
 export type TReturn<T> = {errors?:TObjKeyAnyString, values:T}
 
-type TOnChange = (d:{name:string, value: string|number|boolean})=>void;
+//type TOnChange = (d:{name:string, value: string|number|boolean})=>void;
 
 type TClearError = (d:string)=>void;
 
@@ -18,7 +18,7 @@ const useSimpleForm = <T extends {}>({state, validation}:{
   data: T,
   errors: TObjKeyAnyString,
   clearError: TClearError,
-  onChange: TOnChange,
+  onChange: TOnChangeInput,
   setErrors: React.Dispatch<React.SetStateAction<TObjKeyAnyString>>
   handleSubmit: THandleSubmit<T>
 }=>{
@@ -29,7 +29,7 @@ const useSimpleForm = <T extends {}>({state, validation}:{
     setData(state);
   }, [state]);
 
-  const onChange:TOnChange = ({name, value})=>{
+  const onChange:TOnChangeInput = ({name, value})=>{
     setData(prev=>{
         return {
           ...prev,

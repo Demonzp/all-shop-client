@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TObjKeyAnyString } from '../../types/global';
+import { TObjKeyAnyString, TOnChangeInput } from '../../types/global';
 
 export type TInputTypes = 'text'|'email'|'number'|'password';
 
@@ -7,7 +7,7 @@ type Props = {
   type?: TInputTypes;
   name: string;
   data: TObjKeyAnyString;
-  onChange: (data:{name:string,value:string})=>void;
+  onChange: TOnChangeInput;
   errors?: TObjKeyAnyString;
   disabled?: boolean, 
   readOnly?: boolean,

@@ -14,6 +14,7 @@ const mainMenuCat: ICategory = {
   nameUA: 'на головне меню',
   nameTranslit: 'null',
   categorys: [],
+  zIndex: 1,
   tableProducts: []
 }
 

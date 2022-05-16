@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ETypeCustomErrors, IRejectWithValueError, IRejectWithValueValid } from "../../types/errors";
 import { TObjKeyAnyString } from "../../types/global";
-import { getUser, userReg, userSignin } from "../actions/user";
+import { getUser, tokenMiddleware, userReg, userSignin } from "../actions/user";
 
 export enum ERoles {
   ADMIN = 'admin',
@@ -64,6 +64,19 @@ const sliceUser = createSlice({
     }
   },
   extraReducers: (builder) => {
+
+    builder.addCase(tokenMiddleware.fulfilled, (state, { payload }) => {
+      if(state.user){
+        state.user.token = payload;
+      }
+    });
+
+    builder.addCase(tokenMiddleware.rejected, (state, { payload }) => {
+      state.user = null;
+      state.isAtempted = true;
+      state.isLoading = false;
+    });
+
     builder.addCase(getUser.pending, (state) => {
       state.errorsValid = {};
       state.isLoading = true;

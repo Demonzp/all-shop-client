@@ -3,15 +3,20 @@ import * as bootstrap from 'bootstrap';
 
 type Props = {
   show: boolean;
-  toggleForce?: (data: boolean) => void;
-  children?: JSX.Element | JSX.Element[];
+  toggleForce: (data: boolean) => void;
+  children?: JSX.Element | JSX.Element[] | null;
   title?: string;
 };
 
 const CustomModal: React.FC<Props> = ({ show, title = 'Modal title', toggleForce = () => { }, children }) => {
   const refModal = useRef<HTMLDivElement>(null);
 
-  const preToggle = useCallback(() => { toggleForce(false) }, []);
+  const preToggle = useCallback((e:Event) => {
+    if(e.currentTarget!==e.target){
+      return;
+    }
+    toggleForce(false); 
+  }, []);
   const myModal = useMemo<[bootstrap.Modal, HTMLDivElement]|null>(() => refModal.current ? [new bootstrap.Modal(refModal.current), refModal.current] : null, [refModal.current]);
 
   useEffect(() => {
@@ -33,7 +38,7 @@ const CustomModal: React.FC<Props> = ({ show, title = 'Modal title', toggleForce
     }
   }, [show, myModal]);
   return (
-    <div ref={refModal} className="modal fade" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div ref={refModal} datatype={title} className="modal fade" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">

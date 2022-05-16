@@ -1,9 +1,14 @@
 import { ESex } from './sex';
+import { IStructureFieldProduct } from './structureProduct';
 
 export interface IReqCreateCategory {
   nameUA: string;
   translit: string;
   nameRU: string;
+}
+
+export interface IReqUpDownCategory{
+  nameTranslit: string;
 }
 
 export interface IReqCreateSubCategory extends IReqCreateCategory {
@@ -37,4 +42,9 @@ export type TReqUserReg = {
 export type TReqUserSignin = {
   login: string,
   password: string
+}
+
+export interface TReqTableStructure extends IReqUpDownCategory{
+  fields: IStructureFieldProduct [],
+  characteristics: IStructureFieldProduct []
 }

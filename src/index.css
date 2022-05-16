@@ -47,6 +47,21 @@
   background-color: #bb2d3b;
 }
 
+.m-btn-success{
+  color: white;
+  background-color: #47c083;
+}
+
+.m-btn-secondary{
+  color: black;
+  background-color: #d1c4d0;
+}
+
+.m-btn-secondary:hover{
+  color: black;
+  background-color: #b8abb7;
+}
+
 .bg-primary{
   background-color: rgb(145, 40, 125) !important;
 }

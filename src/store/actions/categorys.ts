@@ -1,20 +1,22 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import CustomValidationError from '../../services/customValidationError';
-import { fetchCategorys, fetchCreateCategory1, fetchCreateSubCategory, fetchDelCategory, fetchEditCategory, fetchTranserCategory } from '../../services/fetchCategoryManag';
+import { fetchCategorys, fetchCreateCategory1, fetchCreateSubCategory, fetchDelCategory, fetchDownCategory, fetchEditCategory, fetchTranserCategory, fetchUpCategory } from '../../services/fetchCategoryManag';
 import { ETypeCustomErrors, ICustomValidationError, IRejectWithValueError, IRejectWithValueValid } from '../../types/errors';
 import { TObjKeyAnyString } from '../../types/global';
-import { IReqCreateCategory, IReqCreateSubCategory, IReqEditCategory, TReqDelCategory, TReqTransferCategory } from '../../types/reqTypes';
+import { IReqCreateCategory, IReqCreateSubCategory, IReqEditCategory, IReqUpDownCategory, TReqDelCategory, TReqTransferCategory } from '../../types/reqTypes';
+import { IResUpDownCategory } from '../../types/resTypes';
 import { ICategory } from '../slices/categorys';
 import { ERoles } from '../slices/user';
 import { RootState } from '../store';
+import { tokenMiddleware } from './user';
 
-export const createSubCategory = createAsyncThunk<string, TObjKeyAnyString, {
+export const createSubCategory = createAsyncThunk<ICategory, TObjKeyAnyString, {
   state: RootState,
-  rejectWithValue: IRejectWithValueError | IRejectWithValueValid
+  rejectValue: IRejectWithValueError | IRejectWithValueValid
 }>
   (
     'category/createSubCategory',
-    async (data, { getState, rejectWithValue }) => {
+    async (data, {dispatch, getState, rejectWithValue }) => {
       try {
         const user = getState().user.user;
         if (!user || user.role !== ERoles.ADMIN) {
@@ -31,8 +33,9 @@ export const createSubCategory = createAsyncThunk<string, TObjKeyAnyString, {
           parceData.translit = data.translit;
         }
 
-        const category = await fetchCreateSubCategory(parceData);
-        return category;
+        const res = await fetchCreateSubCategory(parceData);
+        await dispatch(tokenMiddleware(res));
+        return res.category;
       } catch (error) {
         const err = error as Error;
 
@@ -46,11 +49,11 @@ export const createSubCategory = createAsyncThunk<string, TObjKeyAnyString, {
 
 export const editCategory = createAsyncThunk<ICategory, TObjKeyAnyString, {
   state: RootState,
-  rejectWithValue: IRejectWithValueError | IRejectWithValueValid
+  rejectValue: IRejectWithValueError | IRejectWithValueValid
 }>
   (
     'category/editCategory',
-    async (data, { getState, rejectWithValue }) => {
+    async (data, { dispatch, getState, rejectWithValue }) => {
       try {
         const user = getState().user.user;
         if (!user || user.role !== ERoles.ADMIN) {
@@ -67,8 +70,11 @@ export const editCategory = createAsyncThunk<ICategory, TObjKeyAnyString, {
           parceData.translit = data.translit;
         }
 
-        const category = await fetchEditCategory(parceData);
-        return category;
+        const res = await fetchEditCategory(parceData);
+
+        await dispatch(tokenMiddleware(res));
+
+        return res.category;
       } catch (error) {
         const err = error as Error;
 
@@ -82,19 +88,22 @@ export const editCategory = createAsyncThunk<ICategory, TObjKeyAnyString, {
 
 export const transferCategory = createAsyncThunk<ICategory, TReqTransferCategory, {
   state: RootState,
-  rejectWithValue: IRejectWithValueError | IRejectWithValueValid
+  rejectValue: IRejectWithValueError | IRejectWithValueValid
 }>
   (
     'category/transferCategory',
-    async (data, { getState, rejectWithValue }) => {
+    async (data, { dispatch, getState, rejectWithValue }) => {
       try {
         const user = getState().user.user;
         if (!user || user.role !== ERoles.ADMIN) {
           throw new Error('No autorize User');
         }
 
-        const category = await fetchTranserCategory(data);
-        return category;
+        const res = await fetchTranserCategory(data);
+
+        await dispatch(tokenMiddleware(res));
+
+        return res.category;
       } catch (error) {
         const err = error as Error;
 
@@ -108,19 +117,20 @@ export const transferCategory = createAsyncThunk<ICategory, TReqTransferCategory
 
 export const deleteCategory = createAsyncThunk<string, TReqDelCategory, {
   state: RootState,
-  rejectWithValue: IRejectWithValueError | IRejectWithValueValid
+  rejectValue: IRejectWithValueError | IRejectWithValueValid
 }>
   (
     'category/deleteCategory',
-    async (data, { getState, rejectWithValue }) => {
+    async (data, { dispatch, getState, rejectWithValue }) => {
       try {
         const user = getState().user.user;
         if (!user || user.role !== ERoles.ADMIN) {
           throw new Error('No autorize User');
         }
 
-        const category = await fetchDelCategory(data);
-        return category;
+        const res = await fetchDelCategory(data);
+        await dispatch(tokenMiddleware(res));
+        return res.category;
       } catch (error) {
         const err = error as Error;
         console.log('error = ', (err as CustomValidationError<ICustomValidationError>).errors);
@@ -132,14 +142,69 @@ export const deleteCategory = createAsyncThunk<string, TReqDelCategory, {
     }
   );
 
-
-export const createCategory = createAsyncThunk<string, TObjKeyAnyString, {
+export const downCategory = createAsyncThunk<IResUpDownCategory, IReqUpDownCategory, {
   state: RootState,
-  rejectWithValue: IRejectWithValueError | IRejectWithValueValid
+  rejectValue: IRejectWithValueError | IRejectWithValueValid
+}>
+  (
+    'category/downCategory',
+    async (data, { dispatch, getState, rejectWithValue }) => {
+      try {
+        const user = getState().user.user;
+        if (!user || user.role !== ERoles.ADMIN) {
+          throw new Error('No autorize User');
+        }
+
+        const res = await fetchDownCategory(data);
+        await dispatch(tokenMiddleware(res));
+        return res;
+      } catch (error) {
+        const err = error as Error;
+        console.log('error = ', (err as CustomValidationError<ICustomValidationError>).errors);
+        if (err.name === ETypeCustomErrors.VALID_ERROR) {
+          return rejectWithValue({ errorName: ETypeCustomErrors.VALID_ERROR, errors: (err as CustomValidationError<ICustomValidationError>).errors });
+        }
+        return rejectWithValue({ errorName: ETypeCustomErrors.CUSTOM_ERROR, message: (error as Error).message });
+      }
+    }
+  );
+
+export const upCategory = createAsyncThunk<IResUpDownCategory, IReqUpDownCategory, {
+  state: RootState,
+  rejectValue: IRejectWithValueError | IRejectWithValueValid
+}>
+  (
+    'category/upCategory',
+    async (data, { dispatch, getState, rejectWithValue }) => {
+      try {
+        const user = getState().user.user;
+        if (!user || user.role !== ERoles.ADMIN) {
+          throw new Error('No autorize User');
+        }
+
+        const res = await fetchUpCategory(data);
+
+        await dispatch(tokenMiddleware(res));
+
+        return res;
+      } catch (error) {
+        const err = error as Error;
+        console.log('error = ', (err as CustomValidationError<ICustomValidationError>).errors);
+        if (err.name === ETypeCustomErrors.VALID_ERROR) {
+          return rejectWithValue({ errorName: ETypeCustomErrors.VALID_ERROR, errors: (err as CustomValidationError<ICustomValidationError>).errors });
+        }
+        return rejectWithValue({ errorName: ETypeCustomErrors.CUSTOM_ERROR, message: (error as Error).message });
+      }
+    }
+  );
+
+export const createCategory = createAsyncThunk<ICategory, TObjKeyAnyString, {
+  state: RootState,
+  rejectValue: IRejectWithValueError | IRejectWithValueValid
 }>
   (
     'category/createCategory',
-    async (data, { getState, rejectWithValue }) => {
+    async (data, {dispatch, getState, rejectWithValue }) => {
       try {
         const user = getState().user.user;
         if (!user || user.role !== ERoles.ADMIN) {
@@ -155,8 +220,9 @@ export const createCategory = createAsyncThunk<string, TObjKeyAnyString, {
           parceData.translit = data.translit;
         }
 
-        const category = await fetchCreateCategory1(parceData);
-        return category;
+        const res = await fetchCreateCategory1(parceData);
+        await dispatch(tokenMiddleware(res));
+        return res.category;
       } catch (error) {
         const err = error as Error;
 
@@ -170,14 +236,14 @@ export const createCategory = createAsyncThunk<string, TObjKeyAnyString, {
 
 export const getCategorys = createAsyncThunk<ICategory[], undefined, {
   state: RootState,
-  rejectWithValue: IRejectWithValueError | IRejectWithValueValid
+  rejectValue: IRejectWithValueError | IRejectWithValueValid
 }>
   (
     'category/getCategorys',
     async (_, { rejectWithValue }) => {
       try {
-        const categorys = await fetchCategorys();
-        return categorys;
+        const res = await fetchCategorys();
+        return res.categorys;
       } catch (error) {
         const err = error as Error;
 

@@ -1,6 +1,7 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import sliceCategorys from './slices/categorys';
 import sliceLang from './slices/lang';
+import sliceProductStructureTable from './slices/productStructureTable';
 import sliceDB from './slices/sliceDB';
 import sliceUser from './slices/user';
 
@@ -9,7 +10,8 @@ export const store = configureStore({
     db: sliceDB.reducer,
     user: sliceUser.reducer,
     lang: sliceLang.reducer,
-    categorys: sliceCategorys.reducer
+    categorys: sliceCategorys.reducer,
+    productStructureTable: sliceProductStructureTable.reducer 
   },
 });
 

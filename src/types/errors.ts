@@ -30,3 +30,10 @@ export interface IRejectWithValueError extends IRejectWithValue{
 export interface IRejectWithValueValid extends IRejectWithValue{
   errors: ICustomValidationError[]
 }
+
+export const isRejectWithValueError = (error:IRejectWithValueError|IRejectWithValueValid):error is IRejectWithValueError=>{
+  if(error.errorName===ETypeCustomErrors.VALID_ERROR){
+    return false;
+  }
+  return true;
+};

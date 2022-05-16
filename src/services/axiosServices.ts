@@ -43,6 +43,10 @@ class AxiosServices {
     return await this.axios.put<T>(path, data);
   }
 
+  async patch<T>(path: string, data: any): Promise<AxiosResponse<T>> {
+    return await this.axios.patch<T>(path, data);
+  }
+
   async delete<T>(path: string, data?: any): Promise<AxiosResponse<T>> {
     return await this.axios.delete<T>(path, {data});
   }

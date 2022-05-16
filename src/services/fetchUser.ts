@@ -1,14 +1,16 @@
 import { AxiosError } from 'axios';
 import { IUserBase } from '../store/slices/user';
 import { TReqUserReg, TReqUserSignin } from '../types/reqTypes';
-import { TResSuccess, TResUser } from '../types/resTypes';
+import { IResUser, TResSuccess } from '../types/resTypes';
 import axiosServices from './axiosServices';
 import { errorHandle } from './errorAxiosHandle';
 
-const fetchGetUser = async ():Promise<IUserBase> =>{
+const fetchGetUser = async ():Promise<IResUser> =>{
   try {
-    const user = await axiosServices.get<{user:IUserBase}>('/user');
-    return user.data.user;
+    const res = await axiosServices.get<IResUser>('/user');
+    //const user:IUserBase = {...(res.data.user as IUserBase)};
+    //user.token = res.data.updatedToken!;
+    return res.data;
   } catch (error) {
     return errorHandle(error as AxiosError);
   }
@@ -27,9 +29,12 @@ const fetchUserReg = async (data:TReqUserReg):Promise<string> => {
 
 const fetchUserSignin = async (data:TReqUserSignin):Promise<IUserBase> => {
   try {
-    const res = await axiosServices.post<TResUser>('/user/sign-in', data);
+    const res = await axiosServices.post<IResUser>('/user/sign-in', data);
+    const user:IUserBase = {...(res.data.user as IUserBase)};
 
-    return res.data.user;
+    user.token = res.data.updatedToken!;
+
+    return user;
   } catch (error) {
     return errorHandle(error as AxiosError);
   }

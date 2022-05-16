@@ -1,7 +1,7 @@
 import React from 'react';
 
 type Props = {
-  children?: JSX.Element | JSX.Element[];
+  children?: JSX.Element | JSX.Element[] | null;
 };
 
 const CustomModalBody: React.FC<Props> = ({children}) => {

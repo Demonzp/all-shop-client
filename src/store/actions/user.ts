@@ -5,9 +5,38 @@ import { fetchGetUser, fetchUserReg, fetchUserSignin } from '../../services/fetc
 import { ETypeCustomErrors, ICustomValidationError, IRejectWithValueError, IRejectWithValueValid } from '../../types/errors';
 import { TObjKeyAnyString } from '../../types/global';
 import { TReqUserReg, TReqUserSignin } from '../../types/reqTypes';
+import { IResWhisToken } from '../../types/resTypes';
 import { ESex } from '../../types/sex';
 import { ERoles, IUserBase } from '../slices/user';
 import { RootState } from '../store';
+
+export const tokenMiddleware = createAsyncThunk<string, IResWhisToken, {
+  state: RootState,
+  rejectWithValue: IRejectWithValueError
+}>
+  (
+    'user/tokenMiddleware',
+    async (data, { rejectWithValue }) => {
+      try {
+        if(data.updatedToken){
+          localStorage.setItem('token', data.updatedToken);
+          axiosServices.setAuth(data.updatedToken);
+          return data.updatedToken;
+        }else{
+          localStorage.removeItem('token');
+          axiosServices.setGuest();
+          throw new Error('token dont updated');
+        }
+      } catch (error) {
+        const err = error as Error;
+
+        if (err.name === ETypeCustomErrors.VALID_ERROR) {
+          return rejectWithValue({ errorName: ETypeCustomErrors.VALID_ERROR, errors: (err as CustomValidationError<ICustomValidationError>).errors });
+        }
+        return rejectWithValue({ errorName: ETypeCustomErrors.CUSTOM_ERROR, message: (error as Error).message });
+      }
+    }
+  );
 
 export const getUser = createAsyncThunk<IUserBase, undefined, {
   state: RootState,
@@ -15,13 +44,18 @@ export const getUser = createAsyncThunk<IUserBase, undefined, {
 }>
   (
     'user/getUser',
-    async (_, {getState, rejectWithValue }) => {
+    async (_, { dispatch, getState, rejectWithValue }) => {
       try {
         if(getState().user.user){
           throw new Error('');
         }
         
-        const user = await fetchGetUser();
+        const res = await fetchGetUser();
+        await dispatch(tokenMiddleware(res));
+        const user: IUserBase = res.user as IUserBase;
+
+        user.token = res.updatedToken!;
+        
         return user;
       } catch (error) {
         const err = error as Error;
@@ -74,6 +108,7 @@ export const userSignin = createAsyncThunk<IUserBase, TReqUserSignin, {
       try {
         const user = await fetchUserSignin(data);
         localStorage.setItem('token', user.token);
+        console.log('token = ', user.token);
         axiosServices.setAuth(user.token);
         //user.role = ERoles.ADMIN;
         return user;

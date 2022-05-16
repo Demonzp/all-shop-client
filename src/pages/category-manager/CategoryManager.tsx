@@ -131,10 +131,6 @@ const CategoryManager = () => {
     dispatch(getCategorys());
   }, []);
 
-  useEffect(()=>{
-    console.log(isLoading,'|',errorMessage);
-  }, [isLoading, errorMessage]);
-
   const beginTransfer = (c: ICategory) => {
     toggle();
     setCategorySelect(c);
@@ -235,29 +231,36 @@ const CategoryManager = () => {
           </button>
         </CustomModalFooter>
       </CustomModal>
-      <div className="col cat-manager-cont">
-        <div className="cat-manager-list-cont">
-          <ul className="list-group">
-            {
-              categorys.map(category => {
-                return (
-                  <CategoryManagerItem
-                    key={category.nameTranslit}
-                    category={category}
-                    onTransfer={beginTransfer}
-                    onDelete={beginDelete}
-                  />
-                );
-              })
-            }
-          </ul>
+      {
+        isLoading?
+        'Loading...'
+        :
+        <div className="col cat-manager-cont">
+          <div className="cat-manager-list-cont">
+            <ul className="list-group">
+              {
+                categorys.map((category, i) => {
+                  return (
+                    <CategoryManagerItem
+                      key={category.nameTranslit}
+                      i={i}
+                      length={categorys.length}
+                      category={category}
+                      onTransfer={beginTransfer}
+                      onDelete={beginDelete}
+                    />
+                  );
+                })
+              }
+            </ul>
+          </div>
+          <div className="btn-cont-link" style={{ maxWidth: 200 }}>
+            <NavLink to={ERoutes.CREATE_CATEGORY} className="btn-primary-link">
+              <LangText k="btn-create-category" />
+            </NavLink>
+          </div>
         </div>
-        <div className="btn-cont-link" style={{ maxWidth: 200 }}>
-          <NavLink to={ERoutes.CREATE_CATEGORY} className="btn-primary-link">
-            <LangText k="btn-create-category" />
-          </NavLink>
-        </div>
-      </div>
+      }
     </div>
   );
 };
