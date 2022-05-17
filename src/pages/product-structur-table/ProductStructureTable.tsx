@@ -16,15 +16,18 @@ import { addCharacteristic, addField, delCharacteristic, delField, editCharacter
 import { EColors } from '../../types/colors';
 import { TObjKeyAny, TOnChangeInput } from '../../types/global';
 import { ERoutes } from '../../types/routes';
-import { EFieldsTypes, IStructureFieldProduct } from '../../types/structureProduct';
+import { EFieldsTypes, IBaseStructureField, IStructureFieldProduct } from '../../types/structureProduct';
 
-const initField = {
-  id: createId(6),
-  nameRU: '',
-  nameUA: '',
-  type: EFieldsTypes.STRING,
-  isCanDel: true,
-  defaults: []
+
+const getInitField = ():IStructureFieldProduct=>{
+  return{
+    id: createId(6),
+    nameRU: '',
+    nameUA: '',
+    type: EFieldsTypes.STRING,
+    isCanDel: true,
+    defaults: []
+  };
 };
 
 const ProductStructureTable = () => {
@@ -32,7 +35,7 @@ const ProductStructureTable = () => {
   const refBtnBack = useRef<HTMLButtonElement>(null);
   const { langObj } = useAppSelector(state => state.lang);
   const { fields, characteristics } = useAppSelector(state => state.productStructureTable);
-  const [field, setField] = useState<IStructureFieldProduct>(initField);
+  const [field, setField] = useState<IStructureFieldProduct>(getInitField());
   const [where, setWhere] = useState<'field' | 'characteristic'>('field');
   const [typeAction, setTypeAction] = useState<'add' | 'edit'>('add');
 
@@ -117,7 +120,7 @@ const ProductStructureTable = () => {
       }
       console.log('characteristic = ', field);
     }
-    setField(initField);
+    setField(getInitField());
     toggle();
   };
 
@@ -127,6 +130,15 @@ const ProductStructureTable = () => {
         .unwrap()
         .then(() => refBtnBack.current?.click());
     }
+  };
+
+  const addDefaultValue = (data: IBaseStructureField)=>{
+    setField(prev=>{
+      return {
+        ...prev,
+        defaults: prev.defaults.concat(data)
+      }
+    });
   };
 
   return (
@@ -168,6 +180,7 @@ const ProductStructureTable = () => {
           <ProductStructureDefaultVal 
             type={field.type} 
             defaults={field.defaults}
+            addDefaultValue={addDefaultValue}
           />
         </CustomModalBody>
         <CustomModalFooter>

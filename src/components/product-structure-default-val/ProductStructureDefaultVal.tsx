@@ -3,6 +3,7 @@ import { createId, getLangText } from '../../services/global';
 import { useAppSelector } from '../../store/hooks';
 import { EColors } from '../../types/colors';
 import { TObjKeyAny, TOnChangeInput } from '../../types/global';
+import { ELangs } from '../../types/langs';
 import { EFieldsTypes, IBaseStructureField } from '../../types/structureProduct';
 import CustomColInput from '../custom-col-input';
 import CustomModal from '../custom-modal';
@@ -13,20 +14,23 @@ import LoadingBtn from '../loading-btn';
 type Props = {
   type: EFieldsTypes;
   defaults: IBaseStructureField[];
+  addDefaultValue: (data: IBaseStructureField)=>void;
 }
 
-const initField: IBaseStructureField ={
-  id: createId(6),
-  nameRU:'',
-  nameUA:''
-}
+const getInitField = ():IBaseStructureField => {
+  return {
+    id: createId(6),
+    nameRU:'',
+    nameUA:''
+  }
+};
 
-const ProductStructureDefaultVal:React.FC<Props> = ({type, defaults})=>{
-  const {langObj} = useAppSelector(state=>state.lang);
+const ProductStructureDefaultVal:React.FC<Props> = ({type, defaults, addDefaultValue})=>{
+  const {langObj, lang} = useAppSelector(state=>state.lang);
   const [show, setShow] = useState(false);
   const toggle = ()=>setShow(prev=>!prev);
   const toggleForce = (val: boolean)=>{setShow(val)};
-  const [field, setField] = useState(initField);
+  const [field, setField] = useState(getInitField());
 
   const onChange:TOnChangeInput = ({name, value})=>{
     setField(prev=>{
@@ -36,13 +40,19 @@ const ProductStructureDefaultVal:React.FC<Props> = ({type, defaults})=>{
       }
     });
   };
+
+  const onSubmit = ()=>{
+    addDefaultValue(field);
+    toggle();
+    setField(getInitField());
+  };
   
   return(
     <Fragment>
       <CustomModal
         show={show}
         toggleForce={toggleForce}
-        title={'bgggg'}
+        title={getLangText(langObj, 'title-default-field')}
       >
         <CustomModalBody>
           <CustomColInput
@@ -62,7 +72,7 @@ const ProductStructureDefaultVal:React.FC<Props> = ({type, defaults})=>{
           <LoadingBtn
             isLoading={false}
             title={getLangText(langObj, 'btn-add-field')}
-            onClick={()=>{}}
+            onClick={onSubmit}
           />
           <LoadingBtn
             isLoading={false}
@@ -76,7 +86,7 @@ const ProductStructureDefaultVal:React.FC<Props> = ({type, defaults})=>{
         type===EFieldsTypes.WITH_DEFAULT?
         <Fragment>
           <div>
-            {defaults.join(', ')}
+            {defaults.map(f=>lang===ELangs.RU?f.nameRU:f.nameUA).join(', ')}
           </div> 
           <LoadingBtn 
             isLoading={false} 

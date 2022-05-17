@@ -83,13 +83,21 @@ const sliceProductStructureTable = createSlice({
   reducers: {
 
     addField(state, action: PayloadAction<IStructureFieldProduct>) {
-      state.fields.push(action.payload);
+      const field = action.payload;
+      if(field.type!==EFieldsTypes.WITH_DEFAULT){
+        field.defaults = [];
+      }
+      state.fields.push(field);
     },
 
     editField(state, action: PayloadAction<IStructureFieldProduct>){
-      const idx = state.fields.findIndex(f=>f.id===action.payload.id);
+      const field = action.payload;
+      if(field.type!==EFieldsTypes.WITH_DEFAULT){
+        field.defaults = [];
+      }
+      const idx = state.fields.findIndex(f=>f.id===field.id);
       if(idx>=0){
-        state.fields[idx] = action.payload;
+        state.fields[idx] = field;
       }
     },
 
@@ -101,13 +109,21 @@ const sliceProductStructureTable = createSlice({
     },
 
     addCharacteristic(state, action: PayloadAction<IStructureFieldProduct>){
-      state.characteristics.push(action.payload);
+      const field = action.payload;
+      if(field.type!==EFieldsTypes.WITH_DEFAULT){
+        field.defaults = [];
+      }
+      state.characteristics.push(field);
     },
 
     editCharacteristic(state, action: PayloadAction<IStructureFieldProduct>){
-      const idx = state.characteristics.findIndex(f=>f.id===action.payload.id);
+      const field = action.payload;
+      if(field.type!==EFieldsTypes.WITH_DEFAULT){
+        field.defaults = [];
+      }
+      const idx = state.characteristics.findIndex(f=>f.id===field.id);
       if(idx>=0){
-        state.characteristics[idx] = action.payload;
+        state.characteristics[idx] = field;
       }
     },
 
