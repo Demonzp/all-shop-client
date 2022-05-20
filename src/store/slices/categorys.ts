@@ -1,8 +1,9 @@
-import { createSlice, isRejectedWithValue } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createCategory, createSubCategory, deleteCategory, downCategory, editCategory, getCategorys, transferCategory, upCategory } from '../actions/categorys';
 import { ETypeCustomErrors, IRejectWithValueError, IRejectWithValueValid } from '../../types/errors';
 import { TObjKeyAnyString } from '../../types/global';
 import { IResUpDownCategory } from '../../types/resTypes';
+import { IStructureFieldProduct } from '../../types/structureProduct';
 
 const afterUpDown = (category: ICategory, upDown: IResUpDownCategory): ICategory => {
   if (upDown.downCategory && category.nameTranslit === upDown.downCategory.nameTranslit) {
@@ -31,34 +32,61 @@ const sortCategorys = (categorys: ICategory[]) => {
   });
 };
 
+type TTableProducts = { fields: IStructureFieldProduct[], characteristics: IStructureFieldProduct[] } | null;
+
 export interface ICategory {
   nameUA: string;
   nameRU: string;
   nameTranslit: string;
   categorys: ICategory[];
-  tableProducts: any[];
+  tableProduct: TTableProducts;
   zIndex: number;
 }
 
 export interface IMainStateCategory {
   categorys: ICategory[];
+  category: ICategory | null;
   errorMessage: string;
   errorsValid: TObjKeyAnyString;
   isLoading: boolean;
+  isLoaded: boolean;
 }
 
 const initialState: IMainStateCategory = {
   categorys: [],
+  category: null,
   errorsValid: {},
   errorMessage: '',
-  isLoading: false
+  isLoading: false,
+  isLoaded: false
 };
+
+const fiend = (categorys: ICategory[], nameTranslit: string): ICategory | null => {
+
+  for (let i = 0; i < categorys.length; i++) {
+    const c = categorys[i];
+    console.log(c.nameTranslit);
+    if (c.nameTranslit === nameTranslit) {
+      console.log('nashol!!!!!!!! = ', c);
+      return c;
+    } else {
+
+      if (c.categorys.length > 0) {
+        return fiend(c.categorys, nameTranslit);
+      }
+    }
+  }
+  console.log('tyt!!!');
+  return null;
+}
 
 const sliceCategorys = createSlice({
   name: 'categorys',
   initialState,
   reducers: {
-
+    findCategory(state, action: PayloadAction<string>) {
+      state.category = fiend(state.categorys, action.payload);
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(editCategory.pending, (state) => {
@@ -164,12 +192,12 @@ const sliceCategorys = createSlice({
 
     builder.addCase(deleteCategory.rejected, (state, { payload }) => {
 
-      if(!payload){
+      if (!payload) {
         state.errorMessage = 'unknoun error';
         state.isLoading = false;
         return;
       }
-      
+
       if (payload.errorName === ETypeCustomErrors.VALID_ERROR) {
         (payload as IRejectWithValueValid).errors.forEach(err => {
           state.errorsValid[err.field] = err.message;
@@ -200,21 +228,26 @@ const sliceCategorys = createSlice({
       state.errorsValid = {};
       state.errorMessage = '';
       state.isLoading = true;
+      state.isLoaded = false;
     });
 
     builder.addCase(getCategorys.fulfilled, (state, { payload }) => {
       //console.log('payload = ', payload);
       sortCategorys(payload);
       state.categorys = payload;
+      state.isLoaded = true;
       state.isLoading = false;
     });
 
     builder.addCase(getCategorys.rejected, (state, { payload }) => {
       state.errorMessage = (payload as IRejectWithValueError).message;
       state.isLoading = false;
+      state.isLoaded = true;
     });
 
   }
 });
+
+export const { findCategory } = sliceCategorys.actions;
 
 export default sliceCategorys;

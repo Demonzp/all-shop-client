@@ -16,7 +16,7 @@ export const createSubCategory = createAsyncThunk<ICategory, TObjKeyAnyString, {
 }>
   (
     'category/createSubCategory',
-    async (data, {dispatch, getState, rejectWithValue }) => {
+    async (data, { dispatch, getState, rejectWithValue }) => {
       try {
         const user = getState().user.user;
         if (!user || user.role !== ERoles.ADMIN) {
@@ -204,7 +204,7 @@ export const createCategory = createAsyncThunk<ICategory, TObjKeyAnyString, {
 }>
   (
     'category/createCategory',
-    async (data, {dispatch, getState, rejectWithValue }) => {
+    async (data, { dispatch, getState, rejectWithValue }) => {
       try {
         const user = getState().user.user;
         if (!user || user.role !== ERoles.ADMIN) {

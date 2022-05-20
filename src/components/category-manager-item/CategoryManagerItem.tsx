@@ -96,7 +96,7 @@ const CategoryManagerItem: React.FC<Props> = ({ category, parent, onTransfer, on
                     className="btn btn-primary"
                     onClick={() => navigate(`${ERoutes.PRODUCT_STRUCTURE}/${category.nameTranslit}`)}
                   >
-                    <LangText k="btn-add-tableProduct" />
+                    <LangText k={category.tableProduct?"btn-edit-tableProduct":"btn-add-tableProduct"} />
                   </div>
                 :
                   null

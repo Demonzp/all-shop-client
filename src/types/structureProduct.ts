@@ -3,6 +3,7 @@ export enum EFieldsTypes{
   NUMBER='number',
   UNIQUE='unique',
   WITH_DEFAULT='with-default',
+  DATE='date',
   FILE='file'
 }
 
@@ -14,6 +15,10 @@ export interface IBaseStructureField{
 
 export interface IStructureFieldProduct  extends IBaseStructureField{
   type: EFieldsTypes;
+  length: string;
   isCanDel: boolean;
+  isNotNull: boolean;
+  isCharact: boolean;
   defaults: IBaseStructureField [];
+  dId?: string;
 }

@@ -15,7 +15,7 @@ const mainMenuCat: ICategory = {
   nameTranslit: 'null',
   categorys: [],
   zIndex: 1,
-  tableProducts: []
+  tableProduct: null
 }
 
 const CategoryTaransfer: React.FC<Props> = ({ category, isForce, setParent }) => {

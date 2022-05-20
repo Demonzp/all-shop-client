@@ -4,16 +4,20 @@ import * as bootstrap from 'bootstrap';
 type Props = {
   show: boolean;
   toggleForce: (data: boolean) => void;
+  onClose?:()=>void; 
   children?: JSX.Element | JSX.Element[] | null;
   title?: string;
 };
 
-const CustomModal: React.FC<Props> = ({ show, title = 'Modal title', toggleForce = () => { }, children }) => {
+const CustomModal: React.FC<Props> = ({ show, title = 'Modal title', toggleForce = () => { }, onClose, children }) => {
   const refModal = useRef<HTMLDivElement>(null);
 
   const preToggle = useCallback((e:Event) => {
     if(e.currentTarget!==e.target){
       return;
+    }
+    if(onClose){
+      onClose();
     }
     toggleForce(false); 
   }, []);

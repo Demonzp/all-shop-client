@@ -15,61 +15,116 @@ interface IInitState {
 const initialState: IInitState = {
   fields: [
     {
-      id: '1',
+      id: 'name',
       nameUA: 'Назва товару',
       nameRU: 'Название товара',
       type: EFieldsTypes.STRING,
       isCanDel: false,
+      length: '80',
+      isNotNull: true,
+      isCharact: false,
       defaults: []
     },
     {
-      id: '2',
+      id: 'price',
       nameUA: 'Ціна',
       nameRU: 'Цена',
       type: EFieldsTypes.NUMBER,
       isCanDel: false,
+      length: '0',
+      isNotNull: true,
+      isCharact: false,
       defaults: []
     },
     {
-      id: '3',
+      id: 'number',
       nameUA: 'Кількість товару',
       nameRU: 'Количество товара',
       type: EFieldsTypes.NUMBER,
       isCanDel: false,
+      length: '0',
+      isNotNull: true,
+      isCharact: false,
       defaults: []
     },
     {
-      id: '4',
+      id: 'mainFoto',
       nameUA: 'Головна світлина',
       nameRU: 'Главная фотография',
       type: EFieldsTypes.FILE,
       isCanDel: false,
+      length: '40',
+      isNotNull: false,
+      isCharact: false,
       defaults: []
     },
     {
-      id: '5',
+      id: 'fotos',
       nameUA: 'Світлини',
       nameRU: 'Фотографии',
       type: EFieldsTypes.FILE,
       isCanDel: false,
+      length: '300',
+      isNotNull: false,
+      isCharact: false,
       defaults: []
     },
     {
-      id: '6',
+      id: 'discription',
       nameUA: 'Опис товару',
       nameRU: 'Описание товара',
       type: EFieldsTypes.STRING,
       isCanDel: false,
+      length: '400',
+      isNotNull: false,
+      isCharact: false,
       defaults: []
     },
     {
-      id: '7',
+      id: 'createdAt',
+      nameUA: 'Додано товар числа',
+      nameRU: 'Добавлен товар числа',
+      type: EFieldsTypes.DATE,
+      isCanDel: false,
+      length: '264',
+      isNotNull: true,
+      isCharact: false,
+      defaults: []
+    },
+    {
+      id: 'updatedAt',
+      nameUA: 'Змінено товар числа',
+      nameRU: 'Изменен товар числа',
+      type: EFieldsTypes.DATE,
+      isCanDel: false,
+      isNotNull: true,
+      length: '264',
+      isCharact: false,
+      defaults: []
+    },
+    {
+      id: 'stock',
+      nameUA: 'Акція',
+      nameRU: 'Акция',
+      type: EFieldsTypes.STRING,
+      isCanDel: false,
+      isNotNull: false,
+      length: '264',
+      isCharact: false,
+      defaults: []
+    },
+    {
+      id: 'uniqField',
       nameUA: 'Унікальний ідентифікатор',
       nameRU: 'Уникальный идентификатор',
       type: EFieldsTypes.UNIQUE,
       isCanDel: true,
+      isNotNull: true,
+      length: '264',
+      isCharact: false,
       defaults: []
     },
+
   ],
   characteristics: [],
   errorsValid: {},
@@ -77,10 +132,22 @@ const initialState: IInitState = {
   isLoading: false
 };
 
+type TSetFields = {fields:IStructureFieldProduct[],characteristics:IStructureFieldProduct[]}|null;
+
 const sliceProductStructureTable = createSlice({
   name: 'productStructureTable',
   initialState,
   reducers: {
+
+    setFields(state, action: PayloadAction<TSetFields>){
+      if(action.payload){
+        state.fields = action.payload.fields;
+        state.characteristics = action.payload.characteristics;
+      }else{
+        state.fields = initialState.fields;
+        state.characteristics = initialState.characteristics;
+      }
+    },
 
     addField(state, action: PayloadAction<IStructureFieldProduct>) {
       const field = action.payload;
@@ -166,7 +233,8 @@ const sliceProductStructureTable = createSlice({
   }
 });
 
-export const { 
+export const {
+  setFields, 
   addField, 
   editField,
   delField, 

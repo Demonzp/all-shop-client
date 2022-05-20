@@ -10,22 +10,27 @@ import LoadingBtn from '../../components/loading-btn';
 import ProductStructureDefaultVal from '../../components/product-structure-default-val/ProductStructureDefaultVal';
 import ProductStructureTableItem from '../../components/product-structure-table-item';
 import { createId, getLangText, getOptionsFromEnum } from '../../services/global';
+import { getCategorys } from '../../store/actions/categorys';
 import { addProductStructureTable } from '../../store/actions/productStructureTable';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { addCharacteristic, addField, delCharacteristic, delField, editCharacteristic, editField } from '../../store/slices/productStructureTable';
+import { findCategory } from '../../store/slices/categorys';
+import { addCharacteristic, addField, delCharacteristic, delField, editCharacteristic, editField, setFields } from '../../store/slices/productStructureTable';
 import { EColors } from '../../types/colors';
 import { TObjKeyAny, TOnChangeInput } from '../../types/global';
 import { ERoutes } from '../../types/routes';
 import { EFieldsTypes, IBaseStructureField, IStructureFieldProduct } from '../../types/structureProduct';
 
 
-const getInitField = ():IStructureFieldProduct=>{
-  return{
+const getInitField = (): IStructureFieldProduct => {
+  return {
     id: createId(6),
     nameRU: '',
     nameUA: '',
     type: EFieldsTypes.STRING,
     isCanDel: true,
+    length: '40',
+    isNotNull: true,
+    isCharact: false,
     defaults: []
   };
 };
@@ -35,6 +40,7 @@ const ProductStructureTable = () => {
   const refBtnBack = useRef<HTMLButtonElement>(null);
   const { langObj } = useAppSelector(state => state.lang);
   const { fields, characteristics } = useAppSelector(state => state.productStructureTable);
+  const { category, isLoaded, isLoading } = useAppSelector(state => state.categorys);
   const [field, setField] = useState<IStructureFieldProduct>(getInitField());
   const [where, setWhere] = useState<'field' | 'characteristic'>('field');
   const [typeAction, setTypeAction] = useState<'add' | 'edit'>('add');
@@ -49,7 +55,21 @@ const ProductStructureTable = () => {
 
   useEffect(() => {
     console.log('categoryId = ', categoryId);
-  }, [categoryId]);
+    if (categoryId) {
+      if (!isLoaded) {
+        dispatch(getCategorys());
+      } else {
+        dispatch(findCategory(categoryId));
+      }
+    }
+  }, [categoryId, isLoaded]);
+
+  useEffect(() => {
+    console.log('ProductStructureTable category = ', category);
+    if (category) {
+      dispatch(setFields(category.tableProduct));
+    }
+  }, [category]);
 
   const onEditField = (id: string) => {
     const field = fields.find(f => f.id === id);
@@ -60,7 +80,7 @@ const ProductStructureTable = () => {
       setField(field);
       toggle();
     }
-    console.log('editField = ', id);
+    //console.log('editField = ', id);
   };
 
   const onEditCharacteristic = (id: string) => {
@@ -72,11 +92,11 @@ const ProductStructureTable = () => {
       setField(char);
       toggle();
     }
-  }
+  };
 
   const onDelField = (id: string) => {
     dispatch(delField(id));
-    console.log('delField = ', id);
+    //console.log('delField = ', id);
   };
 
   const onDelCharacteristic = (id: string) => {
@@ -91,15 +111,29 @@ const ProductStructureTable = () => {
 
   const onAddCharacteristic = () => {
     setWhere('characteristic');
+    setField({
+      ...getInitField(),
+      isCharact: true
+    });
     setTypeAction('add');
     toggle();
-  }
+  };
 
   const onChange: TOnChangeInput = ({ name, value }) => {
+    let val: any = value;
+    let key: keyof IStructureFieldProduct = 'isNotNull';
+    //console.log('val = ',val);
+    if (name === key) {
+      if (val === 'true') {
+        val = true;
+      } else {
+        val = false;
+      }
+    }
     setField(prev => {
       return {
         ...prev,
-        [name]: value
+        [name]: val
       }
     })
   };
@@ -132,8 +166,8 @@ const ProductStructureTable = () => {
     }
   };
 
-  const addDefaultValue = (data: IBaseStructureField)=>{
-    setField(prev=>{
+  const addDefaultValue = (data: IBaseStructureField) => {
+    setField(prev => {
       return {
         ...prev,
         defaults: prev.defaults.concat(data)
@@ -161,13 +195,23 @@ const ProductStructureTable = () => {
             data={(field as TObjKeyAny)}
             onChange={onChange}
           />
+          <div className="form-check" style={{ marginTop: 10 }}>
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={field.isNotNull}
+              onChange={e => onChange({ name: 'isNotNull' as keyof IStructureFieldProduct, value: String(e.target.checked) })}
+            />
+            <label className="col-sm-2 col-form-label"><LangText k="title-check-is-require" /></label>
+          </div>
           <div className="row mb-3 p-t-20">
             <label className="col-sm-2 col-form-label"><LangText k="title-type" /></label>
             <div className="col-sm-5">
               <select
                 className="form-select form-select-sm"
                 aria-label="form-select-sm example"
-                onChange={(e) =>onChange({ name: 'type', value: e.target.value })}
+                value={field.type}
+                onChange={(e) => onChange({ name: 'type', value: e.target.value })}
               >
                 {
                   getOptionsFromEnum(EFieldsTypes).map(s => {
@@ -177,8 +221,19 @@ const ProductStructureTable = () => {
               </select>
             </div>
           </div>
-          <ProductStructureDefaultVal 
-            type={field.type} 
+          {
+            field.type === EFieldsTypes.STRING ?
+              <CustomColInput
+                name='length'
+                label={getLangText(langObj, 'title-max-lenght')}
+                data={(field as TObjKeyAny)}
+                onChange={onChange}
+              />
+              :
+              <Fragment></Fragment>
+          }
+          <ProductStructureDefaultVal
+            type={field.type}
             defaults={field.defaults}
             addDefaultValue={addDefaultValue}
           />
@@ -197,89 +252,98 @@ const ProductStructureTable = () => {
           />
         </CustomModalFooter>
       </CustomModal>
-      <div className="card">
-        <div className='card-body'>
-          <h5 className="card-title">
-            {getLangText(langObj, 'title-fields')}
-          </h5>
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">{getLangText(langObj, 'name-field')}</th>
-                <th scope="col">{getLangText(langObj, 'type-filed')}</th>
-                <th scope="col">{getLangText(langObj, 'actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                fields.map(f => {
-                  return <ProductStructureTableItem
-                    key={f.id}
-                    field={f}
-                    edit={onEditField}
-                    del={onDelField}
-                  />
-                })
-              }
-            </tbody>
-          </table>
-          <LoadingBtn
-            type={EColors.SUCCESS}
-            isLoading={false}
-            title={getLangText(langObj, 'btn-add-field')}
-            onClick={onAddField}
-          />
-        </div>
-      </div>
+      {
+        isLoading ?
+          <div>Loading...</div>
+          :
+          <Fragment>
+            <div className="card">
+              <div className='card-body'>
+                <h5 className="card-title">
+                  {getLangText(langObj, 'title-fields')}
+                </h5>
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col">{getLangText(langObj, 'name-field')}</th>
+                      <th scope="col">{getLangText(langObj, 'type-filed')}</th>
+                      <th scope="col">lenth</th>
+                      <th scope="col">{getLangText(langObj, 'actions')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      fields.map(f => {
+                        return <ProductStructureTableItem
+                          key={f.id}
+                          field={f}
+                          edit={onEditField}
+                          del={onDelField}
+                        />
+                      })
+                    }
+                  </tbody>
+                </table>
+                <LoadingBtn
+                  type={EColors.SUCCESS}
+                  isLoading={false}
+                  title={getLangText(langObj, 'btn-add-field')}
+                  onClick={onAddField}
+                />
+              </div>
+            </div>
 
-      <div className="card">
-        <div className='card-body'>
-          <h5 className="card-title">
-            {getLangText(langObj, 'titile-characteristic')}
-          </h5>
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">{getLangText(langObj, 'name-field')}</th>
-                <th scope="col">{getLangText(langObj, 'type-filed')}</th>
-                <th scope="col">{getLangText(langObj, 'actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                characteristics.map(f => {
-                  return <ProductStructureTableItem
-                    key={f.id}
-                    field={f}
-                    edit={onEditCharacteristic}
-                    del={onDelCharacteristic}
-                  />
-                })
-              }
-            </tbody>
-          </table>
-          <LoadingBtn
-            isLoading={false}
-            type={EColors.SUCCESS}
-            title={getLangText(langObj, 'btn-add-field')}
-            onClick={onAddCharacteristic}
-          />
-        </div>
-      </div>
-      <div className='d-flex justify-content-around p-t-20'>
-        <LoadingBtn
-          isLoading={false}
-          title={getLangText(langObj, 'save')}
-          onClick={onSave}
-        />
-        <BtnLink
-          ref={refBtnBack}
-          type={EColors.SECONDARY}
-          to={ERoutes.CATEGORY_MANAGER}
-        >
-          <LangText k={'cancel'} />
-        </BtnLink>
-      </div>
+            <div className="card">
+              <div className='card-body'>
+                <h5 className="card-title">
+                  {getLangText(langObj, 'titile-characteristic')}
+                </h5>
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col">{getLangText(langObj, 'name-field')}</th>
+                      <th scope="col">{getLangText(langObj, 'type-filed')}</th>
+                      <th scope="col">lenth</th>
+                      <th scope="col">{getLangText(langObj, 'actions')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      characteristics.map(f => {
+                        return <ProductStructureTableItem
+                          key={f.id}
+                          field={f}
+                          edit={onEditCharacteristic}
+                          del={onDelCharacteristic}
+                        />
+                      })
+                    }
+                  </tbody>
+                </table>
+                <LoadingBtn
+                  isLoading={false}
+                  type={EColors.SUCCESS}
+                  title={getLangText(langObj, 'btn-add-field')}
+                  onClick={onAddCharacteristic}
+                />
+              </div>
+            </div>
+            <div className='d-flex justify-content-around p-t-20'>
+              <LoadingBtn
+                isLoading={false}
+                title={getLangText(langObj, 'save')}
+                onClick={onSave}
+              />
+              <BtnLink
+                ref={refBtnBack}
+                type={EColors.SECONDARY}
+                to={ERoutes.CATEGORY_MANAGER}
+              >
+                <LangText k={'cancel'} />
+              </BtnLink>
+            </div>
+          </Fragment>
+      }
     </div>
   )
 };
