@@ -9,7 +9,7 @@ import LoadingBtn from '../loading-btn';
 type Props = {
   field: IStructureFieldProduct,
   edit: (id: string)=>void,
-  del: (id: string)=>void
+  del: (data: IStructureFieldProduct)=>void
 };
 
 const ProductStructureTableItem:React.FC<Props> = ({field, edit, del})=>{
@@ -25,20 +25,19 @@ const ProductStructureTableItem:React.FC<Props> = ({field, edit, del})=>{
       <td>
         {
           field.isCanDel?
-            <Fragment>
-              <LoadingBtn 
-                isLoading={isLoading} 
-                title={getLangText(langObj, 'btn-del-category')}
-                type={EColors.DANGER}
-                onClick={()=>del(field.id)}
-              />   
+            <Fragment>  
               <LoadingBtn 
                 isLoading={isLoading} 
                 title={getLangText(langObj, 'edit')} 
                 onClick={()=>edit(field.id)}
               />
+              <LoadingBtn 
+                isLoading={isLoading} 
+                title={getLangText(langObj, 'btn-del-category')}
+                type={EColors.DANGER}
+                onClick={()=>del(field)}
+              /> 
             </Fragment>
-
             :
             null
         }

@@ -165,7 +165,12 @@ const CategoryManager = () => {
         password
       }))
         .unwrap()
-        .then(() => toggleForce2(false));
+        .then(() => {
+          toggleForce2(false);
+          setPassword('');
+          dispatch(getCategorys());
+        })
+        .catch(()=>setPassword(''));
     }
   };
 

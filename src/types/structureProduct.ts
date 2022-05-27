@@ -19,6 +19,7 @@ export interface IStructureFieldProduct  extends IBaseStructureField{
   isCanDel: boolean;
   isNotNull: boolean;
   isCharact: boolean;
+  isMult: boolean;
   defaults: IBaseStructureField [];
-  dId?: string;
+  dId?: number;
 }

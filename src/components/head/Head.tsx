@@ -67,11 +67,16 @@ const navList: TNavData[] = [
 const navListAdmin: TNavData[] = [
   {
     title: 'AdminPanel',
-    to: '/admin',
+    to: '',
     children: [
       {
         title: 'Category Manager',
-        to: '/category-manager',
+        to: ERoutes.CATEGORY_MANAGER,
+        children:[]
+      },
+      {
+        title: 'Product Manager',
+        to: ERoutes.CREATE_PRODUCT_MANAGER,
         children:[]
       }
     ]

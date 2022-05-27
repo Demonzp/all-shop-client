@@ -61,22 +61,22 @@ const initialState: IMainStateCategory = {
   isLoaded: false
 };
 
-const fiend = (categorys: ICategory[], nameTranslit: string): ICategory | null => {
+const find = (categorys: ICategory[], nameTranslit: string): ICategory | null => {
 
   for (let i = 0; i < categorys.length; i++) {
     const c = categorys[i];
-    console.log(c.nameTranslit);
+    //console.log(c.nameTranslit);
     if (c.nameTranslit === nameTranslit) {
-      console.log('nashol!!!!!!!! = ', c);
+      //console.log('nashol!!!!!!!! = ', c);
       return c;
     } else {
 
       if (c.categorys.length > 0) {
-        return fiend(c.categorys, nameTranslit);
+        return find(c.categorys, nameTranslit);
       }
     }
   }
-  console.log('tyt!!!');
+  //console.log('tyt!!!');
   return null;
 }
 
@@ -85,7 +85,11 @@ const sliceCategorys = createSlice({
   initialState,
   reducers: {
     findCategory(state, action: PayloadAction<string>) {
-      state.category = fiend(state.categorys, action.payload);
+      const category = find(state.categorys, action.payload);
+      state.category = category;
+      if(!category){
+        state.errorMessage = 'category not found!';
+      }
     }
   },
   extraReducers: (builder) => {

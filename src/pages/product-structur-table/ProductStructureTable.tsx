@@ -11,7 +11,7 @@ import ProductStructureDefaultVal from '../../components/product-structure-defau
 import ProductStructureTableItem from '../../components/product-structure-table-item';
 import { createId, getLangText, getOptionsFromEnum } from '../../services/global';
 import { getCategorys } from '../../store/actions/categorys';
-import { addProductStructureTable } from '../../store/actions/productStructureTable';
+import { addProductStructureTable, createProductStructureTable, delProductStructureTable, editProductStructureTable } from '../../store/actions/productStructureTable';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { findCategory } from '../../store/slices/categorys';
 import { addCharacteristic, addField, delCharacteristic, delField, editCharacteristic, editField, setFields } from '../../store/slices/productStructureTable';
@@ -31,6 +31,7 @@ const getInitField = (): IStructureFieldProduct => {
     length: '40',
     isNotNull: true,
     isCharact: false,
+    isMult: false,
     defaults: []
   };
 };
@@ -39,7 +40,7 @@ const ProductStructureTable = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const refBtnBack = useRef<HTMLButtonElement>(null);
   const { langObj } = useAppSelector(state => state.lang);
-  const { fields, characteristics } = useAppSelector(state => state.productStructureTable);
+  const { fields, characteristics, saveActionType, isLoading: isLoadingField } = useAppSelector(state => state.productStructureTable);
   const { category, isLoaded, isLoading } = useAppSelector(state => state.categorys);
   const [field, setField] = useState<IStructureFieldProduct>(getInitField());
   const [where, setWhere] = useState<'field' | 'characteristic'>('field');
@@ -94,13 +95,33 @@ const ProductStructureTable = () => {
     }
   };
 
-  const onDelField = (id: string) => {
-    dispatch(delField(id));
+  const onDelField = (field: IStructureFieldProduct) => {
+    if(saveActionType==='add'){
+      dispatch(delField(field.id));
+    }else{
+      if(field.dId){
+        dispatch(delProductStructureTable({
+          id: field.dId,
+          nameTranslit: categoryId!
+        }));
+      }
+    }
+    //dispatch(delField(id));
     //console.log('delField = ', id);
   };
 
-  const onDelCharacteristic = (id: string) => {
-    dispatch(delCharacteristic(id));
+  const onDelCharacteristic = (field: IStructureFieldProduct) => {
+    if(saveActionType==='add'){
+      dispatch(delCharacteristic(field.id));
+    }else{
+      console.log('delField = ', field);
+      if(field.dId){
+        dispatch(delProductStructureTable({
+          id: field.dId,
+          nameTranslit: categoryId!
+        }));
+      }
+    }
   };
 
   const onAddField = () => {
@@ -121,9 +142,10 @@ const ProductStructureTable = () => {
 
   const onChange: TOnChangeInput = ({ name, value }) => {
     let val: any = value;
-    let key: keyof IStructureFieldProduct = 'isNotNull';
+    let key1: keyof IStructureFieldProduct = 'isNotNull';
+    let key2: keyof IStructureFieldProduct = 'isMult';
     //console.log('val = ',val);
-    if (name === key) {
+    if (name === key1 || name === key2) {
       if (val === 'true') {
         val = true;
       } else {
@@ -140,29 +162,70 @@ const ProductStructureTable = () => {
 
   const onSubmit = () => {
     if (where === 'field') {
-      if (typeAction === 'add') {
-        dispatch(addField(field));
-      } else {
-        dispatch(editField(field));
+      if(saveActionType==='add'){
+        if (typeAction === 'add') {
+          dispatch(addField(field));
+        } else {
+          dispatch(editField(field));
+        }
+        //console.log('field = ', field);
+      }else{
+        if (typeAction === 'add') {
+          dispatch(addProductStructureTable({
+            field,
+            nameTranslit: categoryId!
+          }));
+        } else {
+          dispatch(editProductStructureTable({
+            field,
+            nameTranslit: categoryId!
+          }));
+        }
+        
+        console.log('typeAction = ', typeAction);
       }
-      console.log('field = ', field);
+      setField(getInitField());
+      toggle();
     } else {
-      if (typeAction === 'add') {
-        dispatch(addCharacteristic(field));
-      } else {
-        dispatch(editCharacteristic(field));
+      if(saveActionType==='add'){
+        if (typeAction === 'add') {
+          dispatch(addCharacteristic(field));
+        } else {
+          dispatch(editCharacteristic(field));
+        }
+        //console.log('characteristic = ', field);
+      }else{
+        if (typeAction === 'add') {
+          dispatch(addProductStructureTable({
+            field,
+            nameTranslit: categoryId!
+          }));
+        } else {
+          dispatch(editProductStructureTable({
+            field,
+            nameTranslit: categoryId!
+          }));
+        }
+        console.log('typeAction = ', typeAction);
       }
-      console.log('characteristic = ', field);
+      setField(getInitField());
+      toggle();
     }
-    setField(getInitField());
-    toggle();
+
   };
 
   const onSave = () => {
     if (categoryId) {
-      dispatch(addProductStructureTable(categoryId))
-        .unwrap()
-        .then(() => refBtnBack.current?.click());
+      if(saveActionType==='add'){
+        dispatch(createProductStructureTable(categoryId))
+          .unwrap()
+          .then(() => {
+            if(refBtnBack.current){
+              console.log('click back!!!!!');
+              refBtnBack.current.click();
+            }
+          });
+      }
     }
   };
 
@@ -171,6 +234,24 @@ const ProductStructureTable = () => {
       return {
         ...prev,
         defaults: prev.defaults.concat(data)
+      }
+    });
+  };
+
+  const delDefault = (data: string) => {
+    setField(prev => {
+      return {
+        ...prev,
+        defaults: prev.defaults.filter(f => f.id !== data)
+      }
+    });
+  };
+
+  const editDefault = (data: IBaseStructureField) => {
+    setField(prev => {
+      return {
+        ...prev,
+        defaults: [...prev.defaults.filter(f => f.id !== data.id), data]
       }
     });
   };
@@ -197,30 +278,42 @@ const ProductStructureTable = () => {
           />
           <div className="form-check" style={{ marginTop: 10 }}>
             <input
+              id="form-check"
               className="form-check-input"
               type="checkbox"
               checked={field.isNotNull}
               onChange={e => onChange({ name: 'isNotNull' as keyof IStructureFieldProduct, value: String(e.target.checked) })}
             />
-            <label className="col-sm-2 col-form-label"><LangText k="title-check-is-require" /></label>
+            <label className="col-sm-2 col-form-label" htmlFor="form-check"><LangText k="title-check-is-require" /></label>
           </div>
-          <div className="row mb-3 p-t-20">
-            <label className="col-sm-2 col-form-label"><LangText k="title-type" /></label>
-            <div className="col-sm-5">
-              <select
-                className="form-select form-select-sm"
-                aria-label="form-select-sm example"
-                value={field.type}
-                onChange={(e) => onChange({ name: 'type', value: e.target.value })}
-              >
-                {
-                  getOptionsFromEnum(EFieldsTypes).map(s => {
-                    return <option key={s.value} value={s.value}>{getLangText(langObj, s.label)}</option>
-                  })
-                }
-              </select>
+          {
+            typeAction==='add'?
+            <div className="row mb-3 p-t-20">
+              <label className="col-sm-2 col-form-label"><LangText k="title-type" /></label>
+              <div className="col-sm-5">
+                <select
+                  className="form-select form-select-sm"
+                  aria-label="form-select-sm example"
+                  value={field.type}
+                  onChange={(e) => onChange({ name: 'type', value: e.target.value })}
+                >
+                  {
+                    getOptionsFromEnum(EFieldsTypes).map(s => {
+                      return <option key={s.value} value={s.value}>{getLangText(langObj, s.label)}</option>
+                    })
+                  }
+                </select>
+              </div>
             </div>
-          </div>
+            :
+            <CustomColInput
+              name='type'
+              disabled={true}
+              label={getLangText(langObj, 'title-type')}
+              data={(field as TObjKeyAny)}
+              onChange={onChange}
+            />
+          }
           {
             field.type === EFieldsTypes.STRING ?
               <CustomColInput
@@ -232,20 +325,36 @@ const ProductStructureTable = () => {
               :
               <Fragment></Fragment>
           }
+          {
+            field.type === EFieldsTypes.WITH_DEFAULT ?
+              <div className="form-check" style={{ marginTop: 10 }}>
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={field.isMult}
+                  onChange={e => onChange({ name: 'isMult' as keyof IStructureFieldProduct, value: String(e.target.checked) })}
+                />
+                <label className="col-sm-2 col-form-label"><LangText k="title-check-is-multiple" /></label>
+              </div>
+              :
+              <Fragment></Fragment>
+          }
           <ProductStructureDefaultVal
             type={field.type}
             defaults={field.defaults}
             addDefaultValue={addDefaultValue}
+            delDefault={delDefault}
+            editDefaultValue={editDefault}
           />
         </CustomModalBody>
         <CustomModalFooter>
           <LoadingBtn
-            isLoading={false}
+            isLoading={isLoadingField}
             title={getLangText(langObj, 'btn-add-field')}
             onClick={onSubmit}
           />
           <LoadingBtn
-            isLoading={false}
+            isLoading={isLoadingField}
             type={EColors.SECONDARY}
             title={getLangText(langObj, 'cancel')}
             onClick={toggle}
@@ -286,7 +395,7 @@ const ProductStructureTable = () => {
                 </table>
                 <LoadingBtn
                   type={EColors.SUCCESS}
-                  isLoading={false}
+                  isLoading={isLoadingField}
                   title={getLangText(langObj, 'btn-add-field')}
                   onClick={onAddField}
                 />
@@ -321,7 +430,7 @@ const ProductStructureTable = () => {
                   </tbody>
                 </table>
                 <LoadingBtn
-                  isLoading={false}
+                  isLoading={isLoadingField}
                   type={EColors.SUCCESS}
                   title={getLangText(langObj, 'btn-add-field')}
                   onClick={onAddCharacteristic}
@@ -329,15 +438,21 @@ const ProductStructureTable = () => {
               </div>
             </div>
             <div className='d-flex justify-content-around p-t-20'>
-              <LoadingBtn
-                isLoading={false}
-                title={getLangText(langObj, 'save')}
-                onClick={onSave}
-              />
+              {
+                saveActionType==='add'?
+                <LoadingBtn
+                  isLoading={isLoadingField}
+                  title={getLangText(langObj, 'save')}
+                  onClick={onSave}
+                />
+                :
+                null
+              }
               <BtnLink
                 ref={refBtnBack}
                 type={EColors.SECONDARY}
                 to={ERoutes.CATEGORY_MANAGER}
+                isLoading={isLoadingField}
               >
                 <LangText k={'cancel'} />
               </BtnLink>

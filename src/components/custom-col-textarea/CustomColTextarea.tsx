@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TObjKeyAnyString, TOnChangeInput } from '../../types/global';
 
-export type TInputTypes = 'text'|'email'|'number'|'password'|'date';
-
 type Props = {
-  type?: TInputTypes;
   name: string;
   data: TObjKeyAnyString;
   onChange: TOnChangeInput;
@@ -12,19 +9,12 @@ type Props = {
   disabled?: boolean, 
   readOnly?: boolean,
   label?: string;
+  rows?:number;
+  cols?:number;
 }
 
-const CustomColInput:React.FC<Props> = ({type, name, data, onChange, label, disabled, readOnly, errors}) => {
-  const [calcType, setCalcType] = useState<TInputTypes>();
+const CustomColTextarea:React.FC<Props> = ({name, data, onChange, label, disabled, readOnly, errors, rows=3,cols}) => {
   const [isError, setIsError] = useState(false);
-
-  useEffect(()=>{
-    if(!type){
-      setCalcType('text');
-    }else{
-      setCalcType(type);
-    }
-  }, [type]);
 
   useEffect(()=>{
     if(errors){
@@ -48,8 +38,9 @@ const CustomColInput:React.FC<Props> = ({type, name, data, onChange, label, disa
           :
           null
       }
-      <input
-        type={calcType}
+      <textarea
+        rows={rows}
+        cols={cols}
         disabled={disabled} 
         readOnly={readOnly}
         className={`form-control ${isError?'is-invalid':''}`}
@@ -68,4 +59,4 @@ const CustomColInput:React.FC<Props> = ({type, name, data, onChange, label, disa
   );
 };
 
-export default CustomColInput;
+export default CustomColTextarea;

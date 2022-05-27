@@ -30,21 +30,29 @@ export type TReqDelCategory = {
 }
 
 export type TReqUserReg = {
-  email: string,
-  firstName: string,
-  secondName: string,
-  phoneNumber: string,
-  sex: ESex,
-  birthday: number,
-  password: string
+  email: string;
+  firstName: string;
+  secondName: string;
+  phoneNumber: string;
+  sex: ESex;
+  birthday: number;
+  password: string;
 }
 
 export type TReqUserSignin = {
-  login: string,
-  password: string
+  login: string;
+  password: string;
 }
 
 export interface TReqTableStructure extends IReqUpDownCategory{
-  fields: IStructureFieldProduct [],
-  characteristics: IStructureFieldProduct []
+  fields: IStructureFieldProduct [];
+  characteristics: IStructureFieldProduct [];
+}
+
+export interface TReqEditAddTableStructure extends IReqUpDownCategory{
+  field: IStructureFieldProduct;
+}
+
+export interface TReqDelFieldTableStructure extends IReqUpDownCategory{
+  id: number;
 }

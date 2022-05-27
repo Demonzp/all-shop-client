@@ -15,6 +15,8 @@ type Props = {
   type: EFieldsTypes;
   defaults: IBaseStructureField[];
   addDefaultValue: (data: IBaseStructureField)=>void;
+  delDefault: (data: string)=>void;
+  editDefaultValue: (data: IBaseStructureField)=>void;
 }
 
 const getInitField = ():IBaseStructureField => {
@@ -25,12 +27,19 @@ const getInitField = ():IBaseStructureField => {
   }
 };
 
-const ProductStructureDefaultVal:React.FC<Props> = ({type, defaults, addDefaultValue})=>{
+const ProductStructureDefaultVal:React.FC<Props> = ({
+  type, 
+  defaults, 
+  addDefaultValue,
+  delDefault,
+  editDefaultValue
+})=>{
   const {langObj, lang} = useAppSelector(state=>state.lang);
   const [show, setShow] = useState(false);
   const toggle = ()=>setShow(prev=>!prev);
   const toggleForce = (val: boolean)=>{setShow(val)};
   const [field, setField] = useState(getInitField());
+  const [what, setWhat] = useState<'add'|'edit'>('add');
 
   const onChange:TOnChangeInput = ({name, value})=>{
     setField(prev=>{
@@ -42,10 +51,21 @@ const ProductStructureDefaultVal:React.FC<Props> = ({type, defaults, addDefaultV
   };
 
   const onSubmit = ()=>{
-    addDefaultValue(field);
+    if(what==='add'){
+      addDefaultValue(field);
+    }else{
+      editDefaultValue(field);
+    }
+    setWhat('add');
     toggle();
     setField(getInitField());
   };
+
+  const onEditField = (f:IBaseStructureField)=>{
+    setField(f);
+    setWhat('edit');
+    toggle();
+  }
   
   return(
     <Fragment>
@@ -86,7 +106,40 @@ const ProductStructureDefaultVal:React.FC<Props> = ({type, defaults, addDefaultV
         type===EFieldsTypes.WITH_DEFAULT?
         <Fragment>
           <div>
-            {defaults.map(f=>lang===ELangs.RU?f.nameRU:f.nameUA).join(', ')}
+            {
+              <table className="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">{getLangText(langObj, 'name-field')}</th>
+                  <th scope="col">{getLangText(langObj, 'actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  defaults.map(f=>{
+                    return(
+                      <tr key={f.id}>
+                        <td>{lang===ELangs.RU?f.nameRU:f.nameUA}</td>
+                        <td>
+                        <LoadingBtn 
+                          isLoading={false} 
+                          title={getLangText(langObj, 'edit')} 
+                          onClick={()=>onEditField(f)}
+                        />
+                        <LoadingBtn 
+                          isLoading={false} 
+                          title={getLangText(langObj, 'btn-del-category')}
+                          type={EColors.DANGER}
+                          onClick={()=>delDefault(f.id)}
+                        /> 
+                        </td>
+                      </tr>
+                    );
+                  })
+                }
+              </tbody>
+            </table>
+            }
           </div> 
           <LoadingBtn 
             isLoading={false} 

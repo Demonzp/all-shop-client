@@ -29,7 +29,7 @@ const AlertManager:React.FC<Props> = ({infoMessage, successMessage, errorMessage
   useEffect(()=>{
     if(successMessage){
       if(successMessage.length>0){
-        setType(EAlerts.INFO);
+        setType(EAlerts.SUCCESS);
         setMsg(successMessage);
       }else{
         setMsg('');
@@ -42,7 +42,7 @@ const AlertManager:React.FC<Props> = ({infoMessage, successMessage, errorMessage
   useEffect(()=>{
     if(errorMessage){
       if(errorMessage.length>0){
-        setType(EAlerts.INFO);
+        setType(EAlerts.DANGER);
         setMsg(errorMessage);
       }else{
         setMsg('');
